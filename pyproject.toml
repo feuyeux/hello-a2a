@@ -26,3 +26,6 @@ asyncio_default_fixture_loop_scope = "function"
 
 [dependency-groups]
 dev = ["pytest>=8.3.5", "pytest-mock>=3.14.0", "ruff>=0.11.2"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["common", "hosts", "agents"]

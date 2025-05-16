@@ -148,7 +148,13 @@ class ElementAgent:
 
         # 使用原有的正则表达式作为备选
         if not element_names:
-            for word in re.findall(r"[\u4e00-\u9fa5]{1,2}|[A-Za-z]+", query):
+            # 尝试清理输入文本，移除常见的干扰词
+            cleaned_query = query
+            for noise in ["元素", "和", "的", "信息", "详情", "属性", "特性"]:
+                cleaned_query = cleaned_query.replace(noise, " ")
+            
+            # 在清理后的文本中查找元素
+            for word in re.findall(r"[\u4e00-\u9fa5]{1,2}|[A-Za-z]+", cleaned_query):
                 w = word.strip()
                 if w in chinese_names or w.lower() in names or w.lower() in symbols:
                     element_names.add(w)
@@ -212,88 +218,92 @@ class ElementAgent:
         logger.info(f"[SessionID: {sessionId}] 开始流式处理查询: \"{query}\"")
 
         # 尝试直接处理常见查询模式
-        if "给出" in query and "元素" in query:
-            # 尝试使用内部实现直接查询元素
-            try:
-                # 构建所有元素的中英文名和符号集合
-                names = set()
-                symbols = set()
-                chinese_names = set()
-                for elem in PERIODIC_TABLE:
-                    names.add(elem["name"].lower())
-                    symbols.add(elem["symbol"].lower())
-                    chinese_names.add(elem["chinese_name"].strip())
+        try:
+            # 构建所有元素的中英文名和符号集合
+            names = set()
+            symbols = set()
+            chinese_names = set()
+            for elem in PERIODIC_TABLE:
+                names.add(elem["name"].lower())
+                symbols.add(elem["symbol"].lower())
+                chinese_names.add(elem["chinese_name"].strip())
 
-                # 提取所有可能的元素名
-                element_names = set()
-                # 更全面的元素提取正则表达式，能够处理中文元素名
-                # 对于常见的中文元素名特别处理
-                common_elements = ["氢", "氦", "锂", "铍", "硼", "碳", "氮", "氧", "氟", "氖",
-                                   "钠", "镁", "铝", "硅", "磷", "硫", "氯", "氩", "钾", "钙"]
+            # 提取所有可能的元素名
+            element_names = set()
+            # 更全面的元素提取正则表达式，能够处理中文元素名
+            # 对于常见的中文元素名特别处理
+            common_elements = ["氢", "氦", "锂", "铍", "硼", "碳", "氮", "氧", "氟", "氖",
+                               "钠", "镁", "铝", "硅", "磷", "硫", "氯", "氩", "钾", "钙"]
 
-                # 从查询中直接寻找中文元素名
-                for element in common_elements:
-                    if element in query:
-                        element_names.add(element)
+            # 从查询中直接寻找中文元素名
+            for element in common_elements:
+                if element in query:
+                    element_names.add(element)
 
-                # 使用原有的正则表达式作为备选
-                if not element_names:
-                    for word in re.findall(r"[\u4e00-\u9fa5]{1,2}|[A-Za-z]+", query):
-                        w = word.strip()
-                        if w in chinese_names or w.lower() in names or w.lower() in symbols:
-                            element_names.add(w)
+            # 使用原有的正则表达式作为备选
+            if not element_names:
+                # 尝试清理输入文本，移除常见的干扰词
+                cleaned_query = query
+                for noise in ["元素", "和", "的", "信息", "详情", "属性", "特性"]:
+                    cleaned_query = cleaned_query.replace(noise, " ")
+                
+                # 在清理后的文本中查找元素
+                for word in re.findall(r"[\u4e00-\u9fa5]{1,2}|[A-Za-z]+", cleaned_query):
+                    w = word.strip()
+                    if w in chinese_names or w.lower() in names or w.lower() in symbols:
+                        element_names.add(w)
 
-                if element_names:
-                    # 日志清楚地标记出找到了哪些元素
-                    logger.info(
-                        f"[SessionID: {sessionId}] 从查询中提取到元素: {', '.join(element_names)}")
+            if element_names:
+                # 日志清楚地标记出找到了哪些元素
+                logger.info(
+                    f"[SessionID: {sessionId}] 从查询中提取到元素: {', '.join(element_names)}")
 
-                    results = []
-                    for name in element_names:
-                        # 先发送处理中的状态
-                        yield {"is_task_complete": False, "require_user_input": False,
-                               "content": f"正在查询元素 {name}..."}
+                results = []
+                for name in element_names:
+                    # 先发送处理中的状态
+                    yield {"is_task_complete": False, "require_user_input": False,
+                            "content": f"正在查询元素 {name}..."}
 
-                        try:
-                            # 准备输入参数字典
-                            tool_input = {}
-                            if not name.isascii():
-                                tool_input = {"chinese_name": name}
-                            elif name.lower() in names:
-                                tool_input = {"name": name}
-                            elif name.lower() in symbols:
-                                tool_input = {"symbol": name}
+                    try:
+                        # 准备输入参数字典
+                        tool_input = {}
+                        if not name.isascii():
+                            tool_input = {"chinese_name": name}
+                        elif name.lower() in names:
+                            tool_input = {"name": name}
+                        elif name.lower() in symbols:
+                            tool_input = {"symbol": name}
 
-                            # 直接调用函数而不是工具对象
-                            elem_info = query_element.func(**tool_input)
-                        except Exception as e:
-                            logger.error(
-                                f"[SessionID: {sessionId}] 调用query_element工具失败: {e}", exc_info=True)
-                            elem_info = {
-                                "error": "Failed to query element. Please try again."}
+                        # 直接调用函数而不是工具对象
+                        elem_info = query_element.func(**tool_input)
+                    except Exception as e:
+                        logger.error(
+                            f"[SessionID: {sessionId}] 调用query_element工具失败: {e}", exc_info=True)
+                        elem_info = {
+                            "error": "Failed to query element. Please try again."}
 
-                        if isinstance(elem_info, dict) and "error" in elem_info:
-                            results.append(f"未找到元素: {name}")
-                        else:
-                            # 对元素信息进行格式化后再添加到结果
-                            results.append(format_element_info(elem_info))
+                    if isinstance(elem_info, dict) and "error" in elem_info:
+                        results.append(f"未找到元素: {name}")
+                    else:
+                        # 对元素信息进行格式化后再添加到结果
+                        results.append(format_element_info(elem_info))
 
-                    message = "\n\n".join(results)
-                    logger.info(f"[SessionID: {sessionId}] ✨ 直接返回元素查询结果:")
-                    logger.info("=" * 50)
-                    logger.info(message)
-                    logger.info("=" * 50)
+                message = "\n\n".join(results)
+                logger.info(f"[SessionID: {sessionId}] ✨ 直接返回元素查询结果:")
+                logger.info("=" * 50)
+                logger.info(message)
+                logger.info("=" * 50)
 
-                    # 再发送处理完成的状态
-                    yield {"is_task_complete": True, "require_user_input": False, "content": message}
-                    return
-                else:
-                    logger.warning(
-                        f"[SessionID: {sessionId}] 未从查询中提取到有效元素，尝试使用大模型处理")
-            except Exception as e:
-                logger.error(
-                    f"[SessionID: {sessionId}] ❌ 直接处理元素查询失败: {e}", exc_info=True)
-                # 如果直接处理失败，继续使用大模型处理
+                # 再发送处理完成的状态
+                yield {"is_task_complete": True, "require_user_input": False, "content": message}
+                return
+            else:
+                logger.warning(
+                    f"[SessionID: {sessionId}] 未从查询中提取到有效元素，尝试使用大模型处理")
+        except Exception as e:
+            logger.error(
+                f"[SessionID: {sessionId}] ❌ 直接处理元素查询失败: {e}", exc_info=True)
+            # 如果直接处理失败，继续使用大模型处理
 
         # 如果不是直接的元素查询或直接处理失败，使用大模型处理
         inputs = {"messages": [("user", query)]}
