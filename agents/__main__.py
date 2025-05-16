@@ -1,20 +1,12 @@
 from common.server import A2AServer
 from common.types import AgentCard, AgentCapabilities, AgentSkill, MissingAPIKeyError
+from common.utils.logger import setup_logger
 from common.utils.push_notification_auth import PushNotificationSenderAuth
 from agents.task_manager import AgentTaskManager
 from agents.agent import ElementAgent
-import click
-import logging
 
-# 配置日志记录，设置为INFO级别
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logger = setup_logger("HelloA2AServer")
 
-
-@click.command()
-@click.option("--host", "host", default="localhost")
-@click.option("--port", "port", default=10000)
 def main(host, port):
     """启动元素查询智能体服务器。"""
     logger.info("【启动】开始初始化元素查询智能体服务器")
@@ -30,11 +22,10 @@ def main(host, port):
         # 定义智能体技能
         skill = AgentSkill(
             id="query_element",
-            name="Periodic Table Query Tool",
+            name="元素周期表工具",
             description="Helps with queries about chemical elements and the periodic table",
             tags=["element", "periodic table", "chemistry"],
-            examples=["What is the atomic number of Oxygen?",
-                      "Show me the properties of Fe"],
+            examples=["氢元素的信息", "氢氦锂铍硼"],
         )
         logger.info(f"【注册】智能体技能已注册：{skill.name}")
 
@@ -85,4 +76,4 @@ def main(host, port):
 
 
 if __name__ == "__main__":
-    main()
+    main( "localhost",10000)

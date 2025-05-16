@@ -21,6 +21,7 @@ from common.types import (
 )
 from common.server.task_manager import InMemoryTaskManager
 from agents.agent import ElementAgent
+from common.utils.logger import setup_logger
 from common.utils.push_notification_auth import PushNotificationSenderAuth
 import common.server.utils as utils
 from typing import Union
@@ -28,8 +29,7 @@ import asyncio
 import logging
 import traceback
 
-logger = logging.getLogger(__name__)
-
+logger = setup_logger("AgentTaskManager")
 
 class AgentTaskManager(InMemoryTaskManager):
     """智能体任务管理器，处理任务发送、更新和通知管理"""

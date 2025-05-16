@@ -1,6 +1,7 @@
 import asyncio
 import threading
 
+from common.utils.logger import setup_logger
 from common.utils.push_notification_auth import PushNotificationReceiverAuth
 
 from starlette.applications import Starlette
@@ -10,11 +11,7 @@ from starlette.responses import Response
 import traceback
 import datetime
 
-
-def log_cn(msg):
-    print(
-        f"[NOTI {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}")
-
+logger = setup_logger("PushNotification")
 
 class PushNotificationListener():
     def __init__(self, host, port, notification_receiver_auth: PushNotificationReceiverAuth):
@@ -36,9 +33,9 @@ class PushNotificationListener():
                 self.start_server(),
                 self.loop,
             )
-            log_cn("======= push notification listener started =======")
+            logger.info("push notification listener started")
         except Exception as e:
-            log_cn(e)
+            logger.error(e)
 
     async def start_server(self):
         import uvicorn
@@ -58,7 +55,7 @@ class PushNotificationListener():
 
     async def handle_validation_check(self, request: Request):
         validation_token = request.query_params.get("validationToken")
-        log_cn(
+        logger.info(
             f"\npush notification verification received => \n{validation_token}\n")
 
         if not validation_token:
@@ -70,12 +67,12 @@ class PushNotificationListener():
         data = await request.json()
         try:
             if not await self.notification_receiver_auth.verify_push_notification(request):
-                log_cn("push notification verification failed")
+                logger.info("push notification verification failed")
                 return
         except Exception as e:
-            log_cn(f"error verifying push notification: {e}")
-            log_cn(traceback.format_exc())
+            logger.error(f"error verifying push notification: {e}")
+            logger.error(traceback.format_exc())
             return
 
-        log_cn(f"\npush notification received => \n{data}\n")
+        logger.info(f"\npush notification received => \n{data}\n")
         return Response(status_code=200)
