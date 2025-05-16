@@ -56,6 +56,21 @@ sequenceDiagram
 - **Push Notification System**: Webhook-based updates with JWK authentication
 - **A2A Protocol Integration**: Full compliance with A2A specifications
 
+## Project Structure
+
+### Element Agent
+The project includes an ElementAgent that provides information about chemical elements from the periodic table:
+
+- **Data Source**: Element data is stored in YAML format in `resources/periodic_table.yml`
+- **Resource Loading**: Data is loaded using the utilities in `resources/loader.py`
+- **Query Functionality**: Elements can be queried by name, symbol, atomic number, or Chinese name
+
+To update the periodic table data:
+- Modify the YAML file directly in `resources/periodic_table.yml`
+
+### Tools
+The ElementAgent exposes a tool for querying element information that can be used by other agents or directly through the A2A protocol.
+
 ## Limitations
 
 - Only supports text-based input/output (no multi-modal support)

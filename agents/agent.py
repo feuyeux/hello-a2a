@@ -1,16 +1,20 @@
+# filepath: /Users/han/coding/hello-a2a/agents/agent.py
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.messages import AIMessage, ToolMessage
-from typing import Any, Dict, AsyncIterable, Literal
+from typing import Any, Dict, AsyncIterable, Literal, Optional
 from pydantic import BaseModel
-from agents.periodic_table import PERIODIC_TABLE
+from agents.resources.loader import get_periodic_table
 from langchain_openai import ChatOpenAI
 import re
 from common.utils.logger import setup_logger
 
 logger = setup_logger("LangGraphAgent")
+
+# 加载元素周期表数据
+PERIODIC_TABLE = get_periodic_table()
 
 # 内存保存器，用于保存智能体的状态
 memory = MemorySaver()
@@ -28,10 +32,10 @@ class ResponseFormat(BaseModel):
 
 @tool
 def query_element(
-    name: str = None,
-    symbol: str = None,
-    atomic_number: int = None,
-    chinese_name: str = None
+    name: Optional[str] = None,
+    symbol: Optional[str] = None,
+    atomic_number: Optional[int] = None,
+    chinese_name: Optional[str] = None
 ) -> dict:
     """查询元素周期表。可根据元素名称、符号、原子序数或中文名称查询。"""
     logger.info(
@@ -111,7 +115,7 @@ class ElementAgent:
         self.graph.config["recursion_limit"] = 50
         logger.info("ElementAgent initialized successfully")
 
-    def invoke(self, query, sessionId) -> str:
+    def invoke(self, query, sessionId) -> Dict[str, Any]:
         """
         同步调用智能体处理查询
 
@@ -181,7 +185,7 @@ class ElementAgent:
                 elif name.lower() in symbols:
                     tool_input = {"symbol": name}
 
-                # 直接调用函数而不是工具对象
+                # 直接调用函数
                 elem_info = query_element.func(**tool_input)
             except Exception as e:
                 logger.error(
@@ -274,7 +278,7 @@ class ElementAgent:
                         elif name.lower() in symbols:
                             tool_input = {"symbol": name}
 
-                        # 直接调用函数而不是工具对象
+                        # 直接调用函数
                         elem_info = query_element.func(**tool_input)
                     except Exception as e:
                         logger.error(
@@ -332,11 +336,12 @@ class ElementAgent:
                 logger.info("=" * 50)
 
                 # 检查输出是否缺乏元素信息 - 多种格式判断
-                if (("元素名称:" not in final_response.get("content") and
-                     "未找到元素" not in final_response.get("content")) or
-                        "查询完成" in final_response.get("content") or
-                        "成功获取" in final_response.get("content") or
-                        "完成" in final_response.get("content")):
+                content = final_response.get("content", "")
+                if (("元素名称:" not in content and
+                     "未找到元素" not in content) or
+                        "查询完成" in content or
+                        "成功获取" in content or
+                        "完成" in content):
                     # 尝试检查LLM是否执行了元素查询但没有返回格式化数据
                     try:
                         current_state = self.graph.get_state(config)
