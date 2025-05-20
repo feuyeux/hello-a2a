@@ -3,3 +3,6 @@ __pycache__
 .env
 .idea
 uv.lock
+*.egg-info
+*.egg
+.vscode

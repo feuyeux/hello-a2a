@@ -153,7 +153,7 @@ class InMemoryTaskManager(TaskManager):
         try:
             await self.set_push_notification_info(task_notification_params.id, task_notification_params.pushNotificationConfig)
         except Exception as e:
-            logger.error(f"Error while setting push notification info: {e}")
+            logger.error(f"设置推送通知信息时发生错误: {e}")
             return JSONRPCResponse(
                 id=request.id,
                 error=InternalError(
