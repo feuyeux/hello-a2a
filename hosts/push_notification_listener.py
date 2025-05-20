@@ -15,6 +15,8 @@ logger = setup_logger("PushNotification")
 
 class PushNotificationListener():
     def __init__(self, host, port, notification_receiver_auth: PushNotificationReceiverAuth):
+        self.server = None
+        self.app = None
         self.host = host
         self.port = port
         self.notification_receiver_auth = notification_receiver_auth
@@ -68,11 +70,11 @@ class PushNotificationListener():
         try:
             if not await self.notification_receiver_auth.verify_push_notification(request):
                 logger.info("push notification verification failed")
-                return
+                return None
         except Exception as e:
             logger.error(f"验证推送通知时发生错误: {e}")
             logger.error(traceback.format_exc())
-            return
+            return None
 
         logger.info(f"\npush notification received => \n{data}\n")
         return Response(status_code=200)
