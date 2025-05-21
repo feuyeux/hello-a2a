@@ -1,0 +1,227 @@
+[
+    {
+        "query": "美元与欧元的汇率是多少?",
+        "expected": "currency",
+        "category": "货币明确"
+    },
+    {
+        "query": "100人民币可以换多少日元?",
+        "expected": "currency",
+        "category": "货币明确"
+    },
+    {
+        "query": "美元最近对港币的汇率如何?",
+        "expected": "currency",
+        "category": "货币明确"
+    },
+    {
+        "query": "What is the exchange rate between USD and EUR?",
+        "expected": "currency",
+        "category": "货币明确"
+    },
+    {
+        "query": "How many JPY for 50 GBP?",
+        "expected": "currency",
+        "category": "货币明确"
+    },
+    {
+        "query": "氢元素的原子量是多少?",
+        "expected": "element",
+        "category": "元素明确"
+    },
+    {
+        "query": "铁元素在周期表中的位置",
+        "expected": "element",
+        "category": "元素明确"
+    },
+    {
+        "query": "氧元素的化学性质",
+        "expected": "element",
+        "category": "元素明确"
+    },
+    {
+        "query": "Properties of Carbon element",
+        "expected": "element",
+        "category": "元素明确"
+    },
+    {
+        "query": "Where is Helium in the periodic table?",
+        "expected": "element",
+        "category": "元素明确"
+    },
+    {
+        "query": "黄金价格最近怎么样",
+        "expected": "currency",
+        "category": "歧义-投资"
+    },
+    {
+        "query": "我想投资白银，价格如何?",
+        "expected": "currency",
+        "category": "歧义-投资"
+    },
+    {
+        "query": "Au的投资价值",
+        "expected": "currency",
+        "category": "歧义-投资"
+    },
+    {
+        "query": "How to invest in gold?",
+        "expected": "currency",
+        "category": "歧义-投资"
+    },
+    {
+        "query": "Silver price trend 2025",
+        "expected": "currency",
+        "category": "歧义-投资"
+    },
+    {
+        "query": "AU元素的电子结构",
+        "expected": "element",
+        "category": "歧义-科学"
+    },
+    {
+        "query": "Ag元素的化学性质",
+        "expected": "element",
+        "category": "歧义-科学"
+    },
+    {
+        "query": "Pt在周期表中的位置",
+        "expected": "element",
+        "category": "歧义-科学"
+    },
+    {
+        "query": "Chemical properties of gold",
+        "expected": "element",
+        "category": "歧义-科学"
+    },
+    {
+        "query": "Atomic number of silver (Ag)",
+        "expected": "element",
+        "category": "歧义-科学"
+    },
+    {
+        "query": "黄金有什么化学特性?",
+        "expected": "element",
+        "category": "混合语境"
+    },
+    {
+        "query": "金和Au有什么关系?",
+        "expected": "element",
+        "category": "混合语境"
+    },
+    {
+        "query": "如何辨别黄金纯度?",
+        "expected": "currency",
+        "category": "混合语境"
+    },
+    {
+        "query": "Is gold a good investment and conductor?",
+        "expected": "currency",
+        "category": "混合语境"
+    },
+    {
+        "query": "Why is silver both a precious metal and element?",
+        "expected": "element",
+        "category": "混合语境"
+    },
+    {
+        "query": "为什么金价和Au的物理性质有关?",
+        "expected": "currency",
+        "category": "复杂查询"
+    },
+    {
+        "query": "黄金ETF和实物黄金的区别以及Au元素的特性",
+        "expected": "currency",
+        "category": "复杂查询"
+    },
+    {
+        "query": "投资铂金的同时需要了解Pt元素的什么特性?",
+        "expected": "currency",
+        "category": "复杂查询"
+    },
+    {
+        "query": "Which is better to invest: gold or silver considering their atomic properties?",
+        "expected": "currency",
+        "category": "复杂查询"
+    },
+    {
+        "query": "How does the electron configuration of Au relate to its value as a currency?",
+        "expected": "element",
+        "category": "复杂查询"
+    },
+    {
+        "query": "金属元素都有哪些?",
+        "expected": "element",
+        "category": "边界情况"
+    },
+    {
+        "query": "贵金属投资指南",
+        "expected": "currency",
+        "category": "边界情况"
+    },
+    {
+        "query": "什么是金本位制?",
+        "expected": "currency",
+        "category": "边界情况"
+    },
+    {
+        "query": "Metals used in currency coins",
+        "expected": "currency",
+        "category": "边界情况"
+    },
+    {
+        "query": "Elements that look like gold",
+        "expected": "element",
+        "category": "边界情况"
+    },
+    {
+        "query": "黄金和白银哪个更值得投资?",
+        "expected": "currency",
+        "category": "决策查询"
+    },
+    {
+        "query": "Au和Ag哪个更稀有?",
+        "expected": "element",
+        "category": "决策查询"
+    },
+    {
+        "query": "铂金和黄金哪个更贵?",
+        "expected": "currency",
+        "category": "决策查询"
+    },
+    {
+        "query": "Which is more conductive, gold or copper?",
+        "expected": "element",
+        "category": "决策查询"
+    },
+    {
+        "query": "Should I buy gold or silver bullion?",
+        "expected": "currency",
+        "category": "决策查询"
+    },
+    {
+        "query": "美元vs欧元",
+        "expected": "currency",
+        "category": "简短查询"
+    },
+    {
+        "query": "金价走势",
+        "expected": "currency",
+        "category": "简短查询"
+    },
+    {
+        "query": "Fe元素",
+        "expected": "element",
+        "category": "简短查询"
+    },
+    {
+        "query": "Gold properties",
+        "expected": "element",
+        "category": "简短查询"
+    },
+    {
+        "query": "Au投资",
+        "expected": "currency",
+        "category": "简短查询"
+    }
+]
