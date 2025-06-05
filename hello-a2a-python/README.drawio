@@ -1,0 +1,115 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.5 Chrome/134.0.6998.205 Electron/35.3.0 Safari/537.36" version="27.0.5">
+  <diagram name="第 1 页" id="lOS7A2R-BPaBN8YwcZdz">
+    <mxGraphModel dx="2301" dy="2172" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-42" value="&lt;span style=&quot;font-size: 15px; font-weight: 700;&quot;&gt;Web UI&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=14;fontFamily=Garamond;" vertex="1" parent="1">
+          <mxGeometry x="-15" y="120" width="250" height="225" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5lY7CkNXTAZODIK3GsJZ-1" target="5lY7CkNXTAZODIK3GsJZ-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5lY7CkNXTAZODIK3GsJZ-1" target="5lY7CkNXTAZODIK3GsJZ-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="5lY7CkNXTAZODIK3GsJZ-1" target="5lY7CkNXTAZODIK3GsJZ-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5lY7CkNXTAZODIK3GsJZ-1" target="5lY7CkNXTAZODIK3GsJZ-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5lY7CkNXTAZODIK3GsJZ-1" target="5lY7CkNXTAZODIK3GsJZ-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-1" value="A2A Client/Client Agent" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=14;fontFamily=Garamond;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="10" y="160" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-5" value="ollama" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="50" y="250" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-6" value="Google ADK" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="50" y="200" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-7" value="Host Agent" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;fillColor=none;fontSize=15;fontFamily=Garamond;fontStyle=1;fontColor=#0066CC;" vertex="1" parent="1">
+          <mxGeometry x="50" y="307" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-8" value="A2A Server/Remote Agent" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=14;fontFamily=Garamond;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="350" y="160" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-9" value="ollama" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="390" y="250" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-10" value="Google ADK" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="390" y="200" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-11" value="Reimbursement Agent" style="rounded=0;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;fontSize=15;fontFamily=Garamond;fontStyle=1;fontColor=#0066CC;" vertex="1" parent="1">
+          <mxGeometry x="360" y="310" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-12" value="A2A Server/Remote Agent" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=14;fontFamily=Garamond;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="350" y="-40" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-13" value="lm studio" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="370" y="50" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-14" value="AG2(AutoGen)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="370" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-15" value="YouTube Captions Agent" style="rounded=0;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;fontSize=15;fontFamily=Garamond;fontStyle=1;fontColor=#0066CC;" vertex="1" parent="1">
+          <mxGeometry x="357.5" y="100" width="185" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=14;fontFamily=Garamond;" edge="1" parent="1" source="5lY7CkNXTAZODIK3GsJZ-16" target="5lY7CkNXTAZODIK3GsJZ-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-16" value="MCP Client" style="rounded=0;whiteSpace=wrap;html=1;direction=south;fontSize=14;fontFamily=Garamond;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="502" width="40" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;fontSize=14;fontFamily=Garamond;" edge="1" parent="1" source="5lY7CkNXTAZODIK3GsJZ-17" target="5lY7CkNXTAZODIK3GsJZ-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-17" value="MCP Server" style="rounded=0;whiteSpace=wrap;html=1;direction=south;fontSize=14;fontFamily=Garamond;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="610" width="40" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-18" value="Youtube.com" style="rounded=0;whiteSpace=wrap;html=1;direction=west;fontSize=14;fontFamily=Garamond;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="690" y="7.5" width="130" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-21" value="A2A Server/Remote Agent" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=14;fontFamily=Garamond;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="350" y="360" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-22" value="lm studio" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="390" y="450" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-23" value="LlamaIndex" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="390" y="400" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-25" value="A2A Server/Remote Agent" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=14;fontFamily=Garamond;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="350" y="560" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-26" value="lm studio" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="390" y="650" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-27" value="Semantic Kernel" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="390" y="600" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-29" value="Currency Agent" style="text;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=15;fontFamily=Garamond;fontStyle=1;fontColor=#0066CC;" vertex="1" parent="1">
+          <mxGeometry x="385" y="-90" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-31" value="A2A Server/Remote Agent" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=14;fontFamily=Garamond;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="350" y="-230" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-32" value="ollama" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="390" y="-140" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-33" value="Google ADK" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Garamond;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="390" y="-190" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-35" value="SK Travel Agent" style="text;whiteSpace=wrap;align=center;fontSize=15;fontFamily=Garamond;fontStyle=1;fontColor=#0066CC;" vertex="1" parent="1">
+          <mxGeometry x="370" y="700" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5lY7CkNXTAZODIK3GsJZ-36" value="Parse and Chat" style="text;whiteSpace=wrap;align=center;fontSize=15;fontFamily=Garamond;fontStyle=1;fontColor=#0066CC;" vertex="1" parent="1">
+          <mxGeometry x="375" y="500" width="150" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "hello-a2a-python"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "maven"
+    directory: "hello-a2a-java"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "gomod"
+    directory: "hello-a2a-go"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "npm"
+    directory: "hello-a2a-js"
+    schedule:
+      interval: "daily"
