@@ -18,7 +18,7 @@ The original implementation used Spring AI with OpenAI APIs. This has been modif
 
 ## Prerequisites
 
-1. Java 17 or higher
+1. Java 21 or higher
 2. Maven 3.6 or higher  
 3. Ollama installed and running locally
 4. qwen3:8b model pulled in Ollama

@@ -223,13 +223,20 @@ class YoutubeMCPAgent:
             logger.info(f'Processing query: {query[:50]}...')
 
             try:
-                # Create stdio server parameters for mcp-youtube with full path
-                mcp_path = os.path.expanduser(
-                    '~/.local/share/uv/tools/mcp-youtube/bin/mcp-youtube')
-                server_params = StdioServerParameters(
-                    command=mcp_path,
-                    args=["run"],  # Add the run subcommand for stdio mode
-                )
+                # Create stdio server parameters for mcp-youtube
+                # Use uv tool run for cross-platform compatibility
+                if os.name == 'nt':  # Windows
+                    server_params = StdioServerParameters(
+                        command="uv",
+                        args=["tool", "run", "mcp-youtube", "run"],
+                    )
+                else:  # Unix-like systems
+                    mcp_path = os.path.expanduser(
+                        '~/.local/share/uv/tools/mcp-youtube/bin/mcp-youtube')
+                    server_params = StdioServerParameters(
+                        command=mcp_path,
+                        args=["run"],  # Add the run subcommand for stdio mode
+                    )
 
                 # Use asyncio.timeout to prevent hanging - 180 seconds for longer videos
                 async with asyncio.timeout(180):

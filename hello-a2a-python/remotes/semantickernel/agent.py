@@ -2,6 +2,18 @@ import asyncio
 import logging
 import os
 import json
+import sys
+
+# 确保在 Windows 上正确处理 UTF-8 编码
+if sys.platform == "win32":
+    import locale
+    # 设置控制台输出编码为 UTF-8
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
+    if hasattr(sys.stderr, 'reconfigure'):
+        sys.stderr.reconfigure(encoding='utf-8')
+    # 设置环境变量确保 UTF-8 编码
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
 
 from collections.abc import AsyncIterable
 from typing import TYPE_CHECKING, Annotated, Any, Literal

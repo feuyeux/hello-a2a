@@ -34,25 +34,27 @@ class MissingAPIKeyError(Exception):
 @click.command()
 @click.option('--host', 'host', default='localhost')
 @click.option('--port', 'port', default=10000)
-@click.option('--llm-provider', 'llm_provider', default='lmstudio', 
+@click.option('--llm-provider', 'llm_provider', default='lmstudio',
               type=click.Choice(['lmstudio', 'ollama'], case_sensitive=False),
               help='LLM 提供商：lmstudio 或 ollama')
 @click.option('--model-name', 'model_name', default='qwen3-8b',
               help='模型名称，默认为 qwen3-8b')
 def main(host, port, llm_provider, model_name):
     """启动货币智能体服务器。
-    
+
     支持使用不同的 LLM 提供商：
     - lmstudio: 使用 LM Studio (默认端口 1234)
     - ollama: 使用 Ollama (默认端口 11434)
     """
     try:
         logger.info(f"启动货币智能体服务器 - LLM 提供商: {llm_provider}, 模型: {model_name}")
-        
-        if not os.getenv('GOOGLE_API_KEY'):
-            raise MissingAPIKeyError(
-                'GOOGLE_API_KEY environment variable not set.'
-            )
+
+        # 对于本地LLM提供商，不需要GOOGLE_API_KEY
+        if llm_provider.lower() not in ['lmstudio', 'ollama']:
+            if not os.getenv('GOOGLE_API_KEY'):
+                raise MissingAPIKeyError(
+                    'GOOGLE_API_KEY environment variable not set.'
+                )
 
         capabilities = AgentCapabilities(
             streaming=True, pushNotifications=True)
@@ -76,7 +78,8 @@ def main(host, port, llm_provider, model_name):
 
         httpx_client = httpx.AsyncClient()
         request_handler = DefaultRequestHandler(
-            agent_executor=CurrencyAgentExecutor(llm_provider=llm_provider, model_name=model_name),
+            agent_executor=CurrencyAgentExecutor(
+                llm_provider=llm_provider, model_name=model_name),
             task_store=InMemoryTaskStore(),
             push_notifier=InMemoryPushNotifier(httpx_client),
         )

@@ -1,7 +1,20 @@
 import logging
+import sys
+import os
 
 import click
 import httpx
+
+# 确保在 Windows 上正确处理 UTF-8 编码
+if sys.platform == "win32":
+    import locale
+    # 设置控制台输出编码为 UTF-8
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
+    if hasattr(sys.stderr, 'reconfigure'):
+        sys.stderr.reconfigure(encoding='utf-8')
+    # 设置环境变量确保 UTF-8 编码
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
 
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
@@ -11,7 +24,19 @@ from remotes.semantickernel.agent_executor import SemanticKernelTravelAgentExecu
 from dotenv import load_dotenv
 
 
-logging.basicConfig(level=logging.INFO)
+# 配置日志输出支持 UTF-8 编码
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+# 确保日志处理器使用 UTF-8 编码
+for handler in logging.root.handlers:
+    if hasattr(handler.stream, 'reconfigure'):
+        handler.stream.reconfigure(encoding='utf-8')
+
 logger = logging.getLogger(__name__)
 
 load_dotenv()
@@ -20,23 +45,25 @@ load_dotenv()
 @click.command()
 @click.option('--host', default='localhost')
 @click.option('--port', default=10030)
-@click.option('--llm-provider', 'llm_provider', default='lmstudio', 
+@click.option('--llm-provider', 'llm_provider', default='lmstudio',
               type=click.Choice(['lmstudio', 'ollama'], case_sensitive=False),
               help='LLM 提供商：lmstudio 或 ollama')
 @click.option('--model-name', 'model_name', default='qwen3-0.6b',
               help='模型名称，默认为 qwen3-0.6b')
 def main(host, port, llm_provider, model_name):
     """Starts the Semantic Kernel Agent server using A2A.
-    
+
     支持使用不同的 LLM 提供商：
     - lmstudio: 使用 LM Studio (默认端口 1234)
     - ollama: 使用 Ollama (默认端口 11434)
     """
-    logger.info(f"启动Semantic Kernel旅行智能体服务器 - LLM 提供商: {llm_provider}, 模型: {model_name}")
-    
+    logger.info(
+        f"启动Semantic Kernel旅行智能体服务器 - LLM 提供商: {llm_provider}, 模型: {model_name}")
+
     httpx_client = httpx.AsyncClient()
     request_handler = DefaultRequestHandler(
-        agent_executor=SemanticKernelTravelAgentExecutor(llm_provider=llm_provider, model_name=model_name),
+        agent_executor=SemanticKernelTravelAgentExecutor(
+            llm_provider=llm_provider, model_name=model_name),
         task_store=InMemoryTaskStore(),
         push_notifier=InMemoryPushNotifier(httpx_client),
     )

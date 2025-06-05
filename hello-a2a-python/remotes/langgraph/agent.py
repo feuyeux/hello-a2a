@@ -20,7 +20,7 @@ from langgraph.prebuilt import create_react_agent
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.WARNING,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 memory = MemorySaver()
@@ -90,9 +90,9 @@ def get_exchange_rate(
             date = data.get('date', currency_date)
 
             if amount == 1.0:
-                result = f'{date} 汇率: 1 {currency_from} = {rate} {currency_to}'
+                result = f'{date} Exchange Rate: 1 {currency_from} = {rate} {currency_to}'
             else:
-                result = f'{date}: {amount} {currency_from} = {converted_amount:.2f} {currency_to} (汇率: 1 {currency_from} = {rate} {currency_to})'
+                result = f'{date}: {amount} {currency_from} = {converted_amount:.2f} {currency_to} (Exchange Rate: 1 {currency_from} = {rate} {currency_to})'
 
             logger.info(f"汇率查询成功: {result}")
             return result

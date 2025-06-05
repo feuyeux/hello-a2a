@@ -1,10 +1,4 @@
-# Agent2Agent (A2A) Protocol - Local Implementation
-
-> **A local implementation of Google's Agent2Agent (A2A) Protocol using local LLMs with multi-agent collaboration**
-
-- 🔗 [A2A Specification and Documentation](https://github.com/google/A2A)
-- 🔗 [Agent2Agent (A2A) Samples](https://github.com/google-a2a/a2a-samples)
-- 🔗 [A2A Python SDK](https://github.com/google/a2a-python)
+# Hello Agent2Agent (A2A) Protocol
 
 This project demonstrates a complete A2A ecosystem where different AI frameworks work together:
 
@@ -18,7 +12,7 @@ This project demonstrates a complete A2A ecosystem where different AI frameworks
 
 ## Project Structure
 
-```
+```sh
 a2a-examples-local0/
 ├── requirements.txt          # All dependencies managed via pip
 ├── hosts/                    # Host applications
@@ -36,14 +30,16 @@ a2a-examples-local0/
 
 ## Prerequisites
 
-1. Create and activate a virtual environment:
+Create and activate a virtual environment:
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  
+# On Windows: 
+venv\Scripts\activate
 ```
 
-2. Install dependencies:
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -73,7 +69,7 @@ pip install -r requirements.txt
 
 #### Langgraph API
 
-https://python.langchain.com/docs/integrations/providers/openai/
+<https://python.langchain.com/docs/integrations/providers/openai/>
 
 `remotes/langgraph/agent.py`
 
@@ -101,16 +97,27 @@ http -b "https://api.frankfurter.app/latest?from=USD&to=CNY&amount=100"
 #### Start Currency Agent
 
 ```bash
-# With LM Studio (default)
+# With LM Studio
 ./start_remote_agent.sh langgraph --host localhost --port 10000 --llm-provider lmstudio --model-name qwen3-8b
 # With Ollama
 ./start_remote_agent.sh langgraph --host localhost --port 10000 --llm-provider ollama --model-name qwen3:8b
+```
+
+Windows
+
+```bash
+# With LM Studio
+.\start_remote_agent.ps1 langgraph --host localhost --port 10000 --llm-provider lmstudio --model-name qwen3-8b
+# With Ollama
+.\start_remote_agent.ps1 langgraph --host localhost --port 10000 --llm-provider ollama --model-name qwen3:8b
 ```
 
 #### Agent Card of Currency Agent
 
 ```bash
 http --body http://localhost:10000/.well-known/agent.json
+
+Invoke-RestMethod -Uri "http://localhost:10000/.well-known/agent.json"
 ```
 
 ```json
@@ -160,15 +167,43 @@ http POST localhost:10000 \
   }' | jq '.result.artifacts'
 ```
 
+windows
+
+```bash
+$body = @'
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "message/send",
+  "params": {
+    "id": "129",
+    "sessionId": "test-session",
+    "acceptedOutputModes": ["text"],
+    "message": {
+      "messageId": "msg-01",
+      "role": "user",
+      "parts": [{
+        "type": "text",
+        "text": "Convert 100 USD to CNY"
+      }]
+    }
+  }
+}
+'@
+
+$response = Invoke-RestMethod -Uri "http://localhost:10000" -Method POST -ContentType "application/json" -Body $body
+$response.result.artifacts
+```
+
 ```json
 [
   {
-    "artifactId": "e08874b6-3d66-45e1-ab45-cff0633a91ac",
+    "artifactId": "768abfc3-5c22-46e4-aed0-c51c020b8b9e",
     "name": "conversion_result",
     "parts": [
       {
         "kind": "text",
-        "text": "根据最新汇率，100美元兑换人民币为719.98元（汇率：1 USD = 7.1998 CNY）"
+        "text": "2025-06-05: 100.0 USD = 717.92 CNY (Exchange Rate: 1 USD = 7.1792 CNY)"
       }
     ]
   }
@@ -179,8 +214,8 @@ http POST localhost:10000 \
 
 #### AG2(AutoGen) API
 
-- https://docs.ag2.ai/latest/docs/user-guide/models/lm-studio/
-- https://docs.ag2.ai/latest/docs/user-guide/models/ollama/
+- <https://docs.ag2.ai/latest/docs/user-guide/models/lm-studio/>
+- <https://docs.ag2.ai/latest/docs/user-guide/models/ollama/>
 
 `remotes/ag2/agent.py`
 
@@ -223,10 +258,21 @@ $HOME/.local/share/uv/tools/mcp-youtube/bin/mcp-youtube --help
 ./start_remote_agent.sh ag2 --host localhost --port 10010 --llm-provider ollama --model-name qwen3:30b-a3b
 ```
 
+Windows
+
+```bash
+# With LM Studio
+.\start_remote_agent.ps1 ag2 --host localhost --port 10010 --llm-provider lmstudio --model-name qwen3-30b-a3b
+# With Ollama
+.\start_remote_agent.ps1 ag2 --host localhost --port 10010 --llm-provider ollama --model-name qwen3:30b-a3b
+```
+
 #### Agent Card of YouTube Agent
 
 ```bash
 http -b http://localhost:10010/.well-known/agent.json
+
+Invoke-RestMethod -Uri "http://localhost:10010/.well-known/agent.json"
 ```
 
 ```json
@@ -278,6 +324,34 @@ http -b POST localhost:10010 \
   }'| jq '.result.artifacts'
 ```
 
+Windows
+
+```bash
+$body = @'
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "message/send",
+  "params": {
+    "id": "921",
+    "sessionId": "test-session",
+    "acceptedOutputModes": ["text"],
+    "message": {
+      "messageId": "msg-01",
+      "role": "user",
+      "parts": [{
+        "type": "text",
+        "text": "Please download the captions from this YouTube video and provide a summary based on the content: https://www.youtube.com/watch?v=4pYzYmSdSH4"
+      }]
+    }
+  }
+}
+'@
+
+$response = Invoke-RestMethod -Uri "http://localhost:10010" -Method POST -ContentType "application/json" -Body $body
+$response.result.artifacts
+```
+
 ```json
 [
   {
@@ -298,8 +372,8 @@ http -b POST localhost:10010 \
 
 #### Google ADK API
 
-- https://google.github.io/adk-docs/agents/models/#using-ollama_chat_provider
-- https://google.github.io/adk-docs/agents/models/#using-openai-provider
+- <https://google.github.io/adk-docs/agents/models/#using-ollama_chat_provider>
+- <https://google.github.io/adk-docs/agents/models/#using-openai-provider>
 
 `remotes/google_adk/agent.py`
 
@@ -317,16 +391,29 @@ class ReimbursementAgent(AgentWithTaskManager):
 #### Start Reimbursement Agent
 
 ```bash
+export GOOGLE_GENAI_USE_VERTEXAI=TRUE
 # With LM Studio (default)
 ./start_remote_agent.sh google_adk --host localhost --port 10020 --llm-provider lmstudio --model-name qwen3-8b
 # With Ollama
 ./start_remote_agent.sh google_adk --host localhost --port 10020 --llm-provider ollama --model-name qwen3:8b
 ```
 
+Windows
+
+```bash
+$env:GOOGLE_GENAI_USE_VERTEXAI = "TRUE"
+# With LM Studio
+.\start_remote_agent.ps1 google_adk --host localhost --port 10020 --llm-provider lmstudio --model-name qwen3-8b
+# With Ollama
+.\start_remote_agent.ps1 google_adk --host localhost --port 10020 --llm-provider ollama --model-name qwen3:8b
+```
+
 #### Agent Card of Reimbursement Agent
 
 ```bash
 http -b http://localhost:10020/.well-known/agent.json
+
+Invoke-RestMethod -Uri "http://localhost:10020/.well-known/agent.json"
 ```
 
 ```json
@@ -353,6 +440,13 @@ http -b http://localhost:10020/.well-known/agent.json
 ```
 
 #### User Case of Reimbursement Agent
+
+The reimbursement agent validates request IDs against predefined formats. Use one of these valid request IDs:
+
+- `REQ-2024-0601-001`
+- `REQ-2024-0601-002`
+- `REQ-2024-0601-003`
+- `REQ-2024-0602-001`
 
 **1. New Expense Report Request:**
 
@@ -434,12 +528,38 @@ curl -X POST http://localhost:10020/ \
         "role": "user",
         "parts": [
           {
-            "text": "表单已填写完成：\n日期：2024-06-01\n金额：500\n目的：出差的交通费用\n申请ID：REQ001"
+            "text": "Form completed: Date: 2024-06-01, Amount: 500, Purpose: Business trip transportation costs, Request ID: REQ-2024-0601-001"
           }
         ]
       }
     }
   }'
+```
+
+Windows
+
+```powershell
+$body = @'
+{
+  "id": "test-form-submit",
+  "method": "message/send",
+  "params": {
+    "messageId": "msg-form-submit",
+    "message": {
+      "messageId": "msg-form-submit",
+      "role": "user",
+      "parts": [
+        {
+          "text": "Form completed: Date: 2024-06-01, Amount: 500, Purpose: Business trip transportation costs, Request ID: REQ-2024-0601-001"
+        }
+      ]
+    }
+  }
+}
+'@
+
+$response = Invoke-RestMethod -Uri "http://localhost:10020/" -Method POST -ContentType "application/json" -Body $body
+$response.result.status
 ```
 
 **Response:** Agent processes and completes the expense report:
@@ -454,7 +574,7 @@ curl -X POST http://localhost:10020/ \
       "name": "response",
       "parts": [
         {
-          "text": "\n\n您的报销申请已成功处理！\n✅ 申请ID: request_id_4221165\n✅ 状态: 已批准\n金额: $500\n业务目的: 出差的交通费用\n\n请注意查收报销款项，如有任何疑问请随时联系财务部门。"
+          "text": "您的报销申请已成功处理！\n✅ 申请ID: REQ-2024-0601-001\n✅ 状态: 已批准\n金额: $500\n业务目的: Business trip transportation costs\n\n请注意查收报销款项，如有任何疑问请随时联系财务部门。"
         }
       ]
     }
@@ -462,22 +582,22 @@ curl -X POST http://localhost:10020/ \
 }
 ```
 
-**3. Direct Request Processing:**
+**2. Invalid Request ID Example:**
 
 ```bash
 curl -X POST http://localhost:10020/ \
   -H "Content-Type: application/json" \
   -d '{
-    "id": "test-reimburse",
+    "id": "test-invalid-id",
     "method": "message/send",
     "params": {
-      "messageId": "msg-reimburse",
+      "messageId": "msg-invalid",
       "message": {
-        "messageId": "msg-reimburse",
+        "messageId": "msg-invalid",
         "role": "user",
         "parts": [
           {
-            "text": "请处理申请ID为REQ001的报销申请"
+            "text": "Form completed: Date: 2024-06-01, Amount: 500, Purpose: Business trip, Request ID: REQ001"
           }
         ]
       }
@@ -485,11 +605,30 @@ curl -X POST http://localhost:10020/ \
   }'
 ```
 
+**Response:** Agent returns form with validation error:
+
+```json
+{
+  "status": {
+    "state": "input-required",
+    "message": {
+      "parts": [
+        {
+          "data": {
+            "instructions": "错误：所提供的请求ID无效。请提供符合格式要求的申请ID，例如：REQ-20240601-001。"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
 ### 4 Travel Agent
 
 #### Semantic Kernel API
 
-- https://learn.microsoft.com/en-us/semantic-kernel/overview/
+- <https://learn.microsoft.com/en-us/semantic-kernel/overview/>
 
 `remotes/semantickernel/agent.py`
 
@@ -532,10 +671,21 @@ class SemanticKernelTravelAgent:
 ./start_remote_agent.sh semantickernel --host localhost --port 10030 --llm-provider ollama --model-name qwen3:30b-a3b
 ```
 
+Windows
+
+```bash
+# With LM Studio
+.\start_remote_agent.ps1 semantickernel --host localhost --port 10030 --llm-provider lmstudio --model-name qwen3-30b-a3b
+# With Ollama
+.\start_remote_agent.ps1 semantickernel --host localhost --port 10030 --llm-provider ollama --model-name qwen3:30b-a3b
+```
+
 #### Agent Card of Travel Agent
 
 ```bash
 http --body http://localhost:10030/.well-known/agent.json
+
+Invoke-RestMethod -Uri "http://localhost:10030/.well-known/agent.json"
 ```
 
 ```json
@@ -584,10 +734,39 @@ http --stream POST localhost:10030 \
       "role": "user",
       "parts": [{
         "type": "text",
-        "text": "我有5000美元预算，想去韩国首尔旅行7天，请帮我制定详细的旅行计划，包括汇率转换和具体的行程安排"
+        "text": "I have a budget of 5,000 US dollars and want to travel to Seoul, South Korea for 7 days. Please help me make a detailed travel plan, including exchange rate conversion and specific itinerary arrangements."
       }]
     }
   }'
+```
+
+Windows
+
+```bash
+$body = @'
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "message/send",
+  "params": {
+    "id": "travel-korea-plan",
+    "sessionId": "test-session",
+    "acceptedOutputModes": ["text"],
+    "streaming": true,
+    "message": {
+      "messageId": "msg-01",
+      "role": "user",
+      "parts": [{
+        "type": "text",
+        "text": "I have a budget of 5,000 US dollars and want to travel to Seoul, South Korea for 7 days. Please help me make a detailed travel plan, including exchange rate conversion and specific itinerary arrangements."
+      }]
+    }
+  }
+}
+'@
+
+$response = Invoke-RestMethod -Uri "http://localhost:10030" -Method POST -ContentType "application/json" -Body $body
+$response.result.artifacts
 ```
 
 **Response with Multi-Agent Collaboration:**
@@ -620,8 +799,8 @@ http --stream POST localhost:10030 \
 
 #### LlamaIndex API
 
-- https://docs.llamaindex.ai/en/stable/examples/llm/ollama/
-- https://docs.llamaindex.ai/en/stable/examples/llm/lmstudio/
+- <https://docs.llamaindex.ai/en/stable/examples/llm/ollama/>
+- <https://docs.llamaindex.ai/en/stable/examples/llm/lmstudio/>
 
 `remotes/llama_index_file_chat/agent.py`
 
@@ -636,14 +815,27 @@ class ParseAndChat(Workflow):
 #### Start File Chat Agent
 
 ```bash
+# With LM Studio
 ./start_remote_agent.sh llama_index_file_chat --host localhost --port 10040 --llm-provider lmstudio --model-name qwen3-30b-a3b
+# With Ollama
 ./start_remote_agent.sh llama_index_file_chat --host localhost --port 10040 --llm-provider ollama --model-name qwen3:30b-a3b
+```
+
+Windows
+
+```bash
+# With LM Studio
+.\start_remote_agent.ps1 llama_index_file_chat --host localhost --port 10040 --llm-provider lmstudio --model-name qwen3-30b-a3b
+# With Ollama
+.\start_remote_agent.ps1 llama_index_file_chat --host localhost --port 10040 --llm-provider ollama --model-name qwen3:30b-a3b
 ```
 
 #### Agent Card of File Chat Agent
 
 ```bash
 http --body http://localhost:10040/.well-known/agent.json
+
+Invoke-RestMethod -Uri "http://localhost:10040/.well-known/agent.json"
 ```
 
 ```json
@@ -679,7 +871,7 @@ http --body http://localhost:10040/.well-known/agent.json
 #### User Case of File Chat Agent
 
 ```bash
-export DOC_PATH=/Users/han/coding/a2a_google/hello-a2a-examples/test_ai_document.txt
+export DOC_PATH=test_file
 export DOC_BASE64=$(base64 -i $DOC_PATH)
 
 http POST localhost:10040 \
@@ -710,6 +902,43 @@ http POST localhost:10040 \
       ]
     }
   }" | jq '.result.artifacts'
+
+$DOC_PATH = "test_file"
+$DOC_BASE64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($DOC_PATH))
+
+$body = @"
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "message/send",
+  "params": {
+    "id": "file-analysis-test",
+    "sessionId": "file-chat-session",
+    "acceptedOutputModes": ["text"],
+    "message": {
+      "messageId": "msg-file-01",
+      "role": "user",
+      "parts": [
+        {
+          "type": "text",
+          "text": "Summarize the doc"
+        },
+        {
+          "type": "file",
+          "file": {
+            "name": "ai_document.txt",
+            "mimeType": "text/plain",
+            "bytes": "$DOC_BASE64"
+          }
+        }
+      ]
+    }
+  }
+}
+"@
+
+$response = Invoke-RestMethod -Uri "http://localhost:10040" -Method POST -ContentType "application/json" -Body $body
+$response.result.artifacts
 ```
 
 ```json
@@ -721,7 +950,7 @@ http POST localhost:10040 \
     "parts": [
       {
         "kind": "text",
-        "text": "<think>\n好的，用户让我分析并总结这个文档。首先我需要仔细阅读文档内容，了解其结构和主要信息。文档标题是“人工智能技术发展报告”，分为几个主要部分：应用领域和未来发展趋势。\n\n先看应用领域部分，有四个主要领域：医疗健康、金融服务、自动驾驶和自然语言处理。每个领域下都有具体的子点。比如医疗健康包括医学影像分析、疾病预测和精准医疗。这些内容对应的行号是4到9，我需要记住每个子点对应的行号，以便后续引用。\n\n接下来是金融服务，行号11到15，提到风险评估、算法交易和反欺诈检测。自动驾驶部分在行号17到21，涉及环境感知、路径规划和车联网。自然语言处理部分在行号23到27，包括机器翻译、智能客服和文本摘要。\n\n然后是未来发展趋势，行号28到33，提到生成式AI、多模态系统、伦理安全和边缘计算优化。我需要确保每个总结点都对应正确的行号，并且引用时使用正确的编号格式。\n\n用户可能希望得到一个结构清晰的总结，涵盖各个主要部分，并正确引用文档中的内容。需要注意的是，内联引用要从[1]开始，每增加一个引用递增，连续行用单个引用，非连续行则分开标注。例如，医疗健康部分有三个子点，可能需要引用行4到9，但具体要看每个子点对应的行号是否连续。\n\n现在组织语言，先概述文档整体内容，然后分点总结应用领域和未来趋势，确保每个要点都有对应的引用。检查是否有遗漏的部分，并确保引用格式正确，避免使用行号作为引用编号，而是按照规则递增。\n</think>\n\n该文档系统阐述了人工智能技术的发展现状与未来方向，以下是核心内容的结构化分析：  \n\n1. **主要应用领域**  \n   - **医疗健康** [4]：AI通过医学影像分析[6]、疾病预测和早期诊断[7]、精准医疗方案制定[8]等技术革新医疗体系。  \n   - **金融服务** [11]：涵盖风险评估和信用分析[12]、算法交易及投资决策[13]、反欺诈检测系统[14]等场景。  \n   - **自动驾驶** [17]：依赖环境感知与目标识别[18]、路径规划与决策系统[19]、车联网与智能交通[20]技术实现。  \n   - **自然语言处理** [23]：推动机器翻译[24]、智能客服与对话系统[25]、文本摘要及信息提取[26]等应用落地。  \n\n2. **未来发展趋势** [28]  \n   - 生成式AI模型持续进化[29]，多模态AI系统实现跨感官数据融合[30]。  \n   - 强调AI伦理与安全性建设[31]，同时优化边缘计算与专用芯片性能[32]以提升效率。  \n\n文档整体呈现了AI技术从垂直领域渗透到跨行业协同的发展脉络，并前瞻性地提出技术演进与社会价值平衡的双重命题。"
+        "text": "..."
       }
     ]
   }

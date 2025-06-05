@@ -112,11 +112,26 @@ fi
 # 激活虚拟环境
 if [ ! -d "$PROJECT_ROOT/venv" ]; then
     echo "❌ 错误: 虚拟环境不存在，请先运行："
-    echo "   python -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+        echo "   python -m venv venv && venv\\Scripts\\activate && pip install -r requirements.txt"
+    else
+        echo "   python -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
+    fi
     exit 1
 fi
 
-source "$PROJECT_ROOT/venv/bin/activate"
+# 检测操作系统并激活相应的虚拟环境
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+    # Windows环境 (Git Bash, MSYS2, Cygwin)
+    if [ -f "$PROJECT_ROOT/venv/Scripts/activate" ]; then
+        source "$PROJECT_ROOT/venv/Scripts/activate"
+    else
+        echo "⚠️  警告: Windows虚拟环境激活脚本未找到"
+    fi
+else
+    # Unix-like环境 (Linux, macOS, WSL)
+    source "$PROJECT_ROOT/venv/bin/activate"
+fi
 
 # 设置PYTHONPATH
 export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
@@ -130,7 +145,7 @@ echo "│ 项目根目录: $PROJECT_ROOT"
 echo "└─────────────────────────────────────────┘"
 
 # 保持在项目根目录，使用模块方式运行
-cd "$PROJECT_ROOT"
+cd "$PROJECT_ROOT" || exit 1
 
 # 构建启动命令
 CMD_ARGS=("--host" "$HOST" "--port" "$PORT")
@@ -138,7 +153,18 @@ if [ ${#EXTRA_ARGS[@]} -gt 0 ]; then
     CMD_ARGS+=("${EXTRA_ARGS[@]}")
 fi
 
-lsof -ti:$PORT | xargs kill -9 2>/dev/null || true
+# 清理端口占用的进程
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+    # Windows环境 - 使用netstat和taskkill
+    netstat -ano | grep ":$PORT " | awk '{print $5}' | sort -u | while read -r pid; do
+        if [ -n "$pid" ] && [ "$pid" != "0" ]; then
+            taskkill //PID "$pid" //F 2>/dev/null || true
+        fi
+    done
+else
+    # Unix-like环境 - 使用lsof
+    lsof -ti:$PORT | xargs kill -9 2>/dev/null || true
+fi
 
 echo "🔧 执行命令: python -m remotes.$AGENT_TYPE ${CMD_ARGS[*]}"
 echo "⏰ $(date '+%Y-%m-%d %H:%M:%S') - 代理启动中..."
