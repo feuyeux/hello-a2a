@@ -41,7 +41,7 @@ google-api-python-client==2.170.0
 google-auth==2.40.2
 google-auth-httplib2==0.2.0
 google-cloud-aiplatform==1.94.0
-google-cloud-bigquery==3.33.0
+google-cloud-bigquery==3.34.0
 google-cloud-core==2.4.3
 google-cloud-resource-manager==1.14.2
 google-cloud-secret-manager==2.23.3
