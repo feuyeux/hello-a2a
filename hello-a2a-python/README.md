@@ -1,100 +1,130 @@
-# Hello Agent2Agent (A2A) Protocol
+# A2A Python Example with Ollama Integration
 
-This project demonstrates a complete A2A ecosystem where different AI frameworks work together:
+This project demonstrates the A2A (Agent2Agent) protocol implementation in Python, modified to use local Ollama qwen3:8b model instead of remote OpenAI services.
 
-- **Travel Agent** (Semantic Kernel) orchestrates complex travel planning by calling other agents
-- **Currency Agent** (LangGraph) provides real-time currency conversion services
-- **YouTube Agent** (AG2+MCP) extracts video content for travel research
-- **Reimbursement Agent** (Google ADK) handles expense workflows with forms
-- **File Chat Agent** (LlamaIndex) enables document-based conversations with file uploads
+## Architecture
 
-🎯 **Key Achievement**: Real cross-agent communication using A2A JSON-RPC protocol with local LLMs!
+- **Model**: Data models for A2A protocol messages and types
+- **Client**: A2A client implementation for sending requests to A2A servers
+- **Server**: A2A server implementation using FastAPI with local Ollama integration
 
-## Project Structure
+## Key Changes
 
-```sh
-a2a-examples-local0/
-├── requirements.txt          # All dependencies managed via pip
-├── hosts/                    # Host applications
-│   ├── cli/                 # CLI host (simplified, no push notifications)
-│   └── webui/               # Web UI host
-│       ├── frontend/        # Frontend application
-│       └── backend/         # Web UI backend
-└── remotes/                  # Remote agent implementations
-    ├── langgraph/           # LangGraph agent
-    ├── ag2/                 # AG2 agent
-    ├── google_adk/          # Google ADK agent
-    ├── semantickernel/      # Semantic Kernel agent
-    └── llama_index_file_chat/ # LlamaIndex agent
-```
+The original implementation used OpenAI APIs. This has been modified to:
+
+1. **Direct HTTP calls to Ollama**: Replaced OpenAI client with direct HTTP calls to local Ollama API
+2. **Local qwen3:8b model**: Uses the qwen3:8b model running on Ollama
+3. **Removed dependencies**: Eliminated OpenAI Python SDK dependencies from the project
 
 ## Prerequisites
 
-Create and activate a virtual environment:
+1. Python 3.9 or higher
+2. pip package manager
+3. Ollama installed and running locally
+4. qwen3:8b model pulled in Ollama
+
+### Setup Ollama
 
 ```bash
-python -m venv venv
-source venv/bin/activate  
-# On Windows: 
-venv\Scripts\activate
+# Install Ollama (if not already installed)
+# See https://ollama.com for installation instructions
+
+# Pull the qwen3:8b model
+ollama pull qwen3:8b
+
+# Verify Ollama is running
+curl http://localhost:11434/api/tags
 ```
 
-Install dependencies:
+## Running the Application
+
+### Start the A2A Server
 
 ```bash
+# Install dependencies
 pip install -r requirements.txt
+
+# Run the server
+python server/main.py
 ```
 
-### Local LLM Services
+The server will start on `http://localhost:8080`
 
-| Service       | Installation                              | Verification                                                     |
-| ------------- | ----------------------------------------- | ---------------------------------------------------------------- |
-| **Ollama**    | [Download](https://ollama.com/install.sh) | `curl -s http://localhost:11434/api/tags \| jq '.models[].name'` |
-| **LM Studio** | [Download](https://lmstudio.ai/)          | `curl -s http://localhost:1234/v1/models \| jq '.data[].id'`     |
+### Test the Translation Service
 
-## Remote & Host Agent List
-
-| Agent                   | Framework       | Port  | Purpose                              |
-| :---------------------- | :-------------- | :---- | :----------------------------------- |
-| **Currency Agent**      | LangGraph       | 10000 | Real-time currency conversion        |
-| **YouTube Agent**       | AG2 + MCP       | 10010 | Video transcript analysis            |
-| **Reimbursement Agent** | Google ADK      | 10020 | Expense processing with forms        |
-| **Travel Agent**        | Semantic Kernel | 10030 | Trip planning with currency          |
-| **File Chat Agent**     | LlamaIndex      | 10040 | Document parsing & Q&A               |
-| **Host Agent**          | Google ADK      | -     | Task orchestration & agent selection |
-
-## Remote Agents
-
-### 1 Currency Agent
-
-#### Langgraph API
-
-<https://python.langchain.com/docs/integrations/providers/openai/>
-
-`remotes/langgraph/agent.py`
-
-```python
-class CurrencyAgent:
-    self.model = ChatOpenAI(
-        model=model_name,
-        base_url=base_url,
-    )
+```bash
+# Run the test client
+python test_ollama_translation.py
 ```
 
-#### Tools of Currency Agent
+### Use the A2A Client
 
-[frankfurter](https://github.com/lineofflight/frankfurter)
-
-```sh
-http -b https://api.frankfurter.dev/v1/currencies
+```bash
+# Run the example client
+python client/main.py
 ```
 
-```sh
-http -b "https://api.frankfurter.dev/v1/latest?from=USD&to=CNY&amount=100"
-http -b "https://api.frankfurter.app/latest?from=USD&to=CNY&amount=100"
+## API Endpoints
+
+- `GET /.well-known/agent-card` - Get agent information
+- `POST /a2a` - Send A2A tasks
+- `POST /a2a/stream` - Send A2A tasks with streaming response
+
+## Implementation Details
+
+The server now uses:
+
+- **httpx**: Async HTTP client for Ollama API calls
+- **Ollama API**: Direct calls to `http://localhost:11434/api/generate`
+- **qwen3:8b model**: Specified in the API request payload
+
+### Key Configuration Changes
+
+1. **server/main.py**:
+
+   - Removed OpenAI client dependencies
+   - Added direct Ollama HTTP client implementation
+   - Modified task handlers to use Ollama API
+
+2. **requirements.txt**:
+
+   - Removed OpenAI SDK dependencies
+   - Kept core FastAPI and HTTP functionality
+
+3. **config/config.py**:
+   - Removed OpenAI configuration
+   - Added Ollama endpoint configuration
+
+## Error Handling
+
+The implementation includes proper error handling for:
+
+- Ollama service connectivity issues
+- Invalid API responses
+- Model generation timeouts
+- JSON parsing errors
+
+## Performance Considerations
+
+- Async HTTP client with configurable timeouts (30s connect, 2min request)
+- Non-streaming API calls for simplicity
+- Concurrent request handling via FastAPI
+
+## Testing
+
+Run the test suite:
+
+```bash
+pytest
 ```
 
-#### Start Currency Agent
+The test client demonstrates basic translation functionality with local Ollama integration.
+
+---
+
+## Original Project Structure (Reference)
+
+The following sections contain the original project documentation for reference:
 
 ```bash
 # With LM Studio

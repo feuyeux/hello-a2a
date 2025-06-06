@@ -19,7 +19,7 @@ The original implementation used Spring AI with OpenAI APIs. This has been modif
 ## Prerequisites
 
 1. Java 21 or higher
-2. Maven 3.6 or higher  
+2. Maven 3.6 or higher
 3. Ollama installed and running locally
 4. qwen3:8b model pulled in Ollama
 
@@ -82,22 +82,25 @@ The server now uses:
 
 ### Key Configuration Changes
 
-1. **A2AServerConfiguration.java**: 
+1. **A2AServerConfiguration.java**:
+
    - Removed Spring AI dependencies
    - Added direct Ollama HTTP client implementation
    - Modified TaskHandler to use Ollama API
 
-2. **pom.xml**: 
+2. **pom.xml**:
+
    - Removed Spring AI BOM and starter dependencies
    - Kept core Spring Boot Web functionality
 
-3. **application.properties**: 
+3. **application.properties**:
    - Removed OpenAI configuration properties
    - Kept basic Spring Boot settings
 
 ## Error Handling
 
 The implementation includes proper error handling for:
+
 - Ollama service connectivity issues
 - Invalid API responses
 - Model generation timeouts
