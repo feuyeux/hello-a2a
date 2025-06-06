@@ -10,6 +10,8 @@ This project demonstrates a complete A2A ecosystem where different AI frameworks
 
 🎯 **Key Achievement**: Real cross-agent communication using A2A JSON-RPC protocol with local LLMs!
 
+![](hello-a2a-python.drawio.png)
+
 ## Project Structure
 
 ```sh
