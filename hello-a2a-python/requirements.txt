@@ -11,7 +11,7 @@ langgraph==0.4.7
 langgraph-checkpoint==2.0.26
 langgraph-prebuilt==0.2.2
 langgraph-sdk==0.1.70
-langsmith==0.3.42
+langsmith==0.3.45
 llama-index==0.12.40
 llama-index-llms-ollama==0.6.1
 openai==1.82.0
