@@ -66,6 +66,16 @@ java -cp ".:client/target/classes:model/target/classes:client/target/dependency/
 mvn exec:java -Dexec.mainClass="com.google.a2a.client.A2AClientExample" -pl client
 ```
 
+### Use Host Agent Cli
+
+```bash
+cd hello-a2a-java
+mvn exec:java -Dexec.mainClass="com.google.a2a.client.HostAgentCli" -Dexec.args="--auto-start" -pl client
+
+
+Convert 100 USD to CNY
+```
+
 ## API Endpoints
 
 - `GET /.well-known/agent-card` - Get agent information

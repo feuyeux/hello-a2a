@@ -1,12 +1,9 @@
 package com.google.a2a.client;
 
-import com.google.a2a.model.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
-
-import java.io.BufferedReader;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.a2a.model.*;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -14,6 +11,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
 
 /**
  * A2A protocol client implementation
@@ -60,7 +58,7 @@ public class A2AClient {
         JSONRPCRequest request = new JSONRPCRequest(
             generateRequestId(),
             "2.0",
-            "tasks/send",
+            "message/send",
             params
         );
         
@@ -78,7 +76,7 @@ public class A2AClient {
         JSONRPCRequest request = new JSONRPCRequest(
             generateRequestId(),
             "2.0",
-            "tasks/get",
+            "message/list",
             params
         );
         
@@ -96,7 +94,7 @@ public class A2AClient {
         JSONRPCRequest request = new JSONRPCRequest(
             generateRequestId(),
             "2.0",
-            "tasks/cancel",
+            "message/pending",
             params
         );
         
@@ -116,14 +114,14 @@ public class A2AClient {
                 JSONRPCRequest request = new JSONRPCRequest(
                     generateRequestId(),
                     "2.0",
-                    "tasks/send",
+                    "message/send",
                     params
                 );
                 
                 String requestBody = objectMapper.writeValueAsString(request);
                 
                 HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(baseUrl + "/a2a/stream"))
+                    .uri(URI.create(baseUrl))
                     .header("Content-Type", "application/json")
                     .header("Accept", "text/event-stream")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -181,7 +179,7 @@ public class A2AClient {
     public AgentCard getAgentCard() throws A2AClientException {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/.well-known/agent-card"))
+                .uri(URI.create(baseUrl + "/.well-known/agent.json"))
                 .header("Accept", "application/json")
                 .GET()
                 .build();
@@ -207,7 +205,7 @@ public class A2AClient {
             String requestBody = objectMapper.writeValueAsString(request);
             
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/a2a"))
+                .uri(URI.create(baseUrl))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
