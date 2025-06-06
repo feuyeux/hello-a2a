@@ -15,7 +15,7 @@ This project demonstrates a complete A2A ecosystem where different AI frameworks
 ## Project Structure
 
 ```sh
-a2a-examples-local0/
+hello-a2a-python/
 ├── requirements.txt          # All dependencies managed via pip
 ├── hosts/                    # Host applications
 │   ├── cli/                 # CLI host (simplified, no push notifications)
