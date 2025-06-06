@@ -1,130 +1,100 @@
 # A2A Python Example with Ollama Integration
 
-This project demonstrates the A2A (Agent2Agent) protocol implementation in Python, modified to use local Ollama qwen3:8b model instead of remote OpenAI services.
+This project demonstrates a complete A2A ecosystem where different AI frameworks work together:
 
-## Architecture
+- **Travel Agent** (Semantic Kernel) orchestrates complex travel planning by calling other agents
+- **Currency Agent** (LangGraph) provides real-time currency conversion services
+- **YouTube Agent** (AG2+MCP) extracts video content for travel research
+- **Reimbursement Agent** (Google ADK) handles expense workflows with forms
+- **File Chat Agent** (LlamaIndex) enables document-based conversations with file uploads
 
-- **Model**: Data models for A2A protocol messages and types
-- **Client**: A2A client implementation for sending requests to A2A servers
-- **Server**: A2A server implementation using FastAPI with local Ollama integration
+🎯 **Key Achievement**: Real cross-agent communication using A2A JSON-RPC protocol with local LLMs!
 
-## Key Changes
+## Project Structure
 
-The original implementation used OpenAI APIs. This has been modified to:
-
-1. **Direct HTTP calls to Ollama**: Replaced OpenAI client with direct HTTP calls to local Ollama API
-2. **Local qwen3:8b model**: Uses the qwen3:8b model running on Ollama
-3. **Removed dependencies**: Eliminated OpenAI Python SDK dependencies from the project
+```sh
+a2a-examples-local0/
+├── requirements.txt          # All dependencies managed via pip
+├── hosts/                    # Host applications
+│   ├── cli/                 # CLI host (simplified, no push notifications)
+│   └── webui/               # Web UI host
+│       ├── frontend/        # Frontend application
+│       └── backend/         # Web UI backend
+└── remotes/                  # Remote agent implementations
+    ├── langgraph/           # LangGraph agent
+    ├── ag2/                 # AG2 agent
+    ├── google_adk/          # Google ADK agent
+    ├── semantickernel/      # Semantic Kernel agent
+    └── llama_index_file_chat/ # LlamaIndex agent
+```
 
 ## Prerequisites
 
-1. Python 3.9 or higher
-2. pip package manager
-3. Ollama installed and running locally
-4. qwen3:8b model pulled in Ollama
-
-### Setup Ollama
+Create and activate a virtual environment:
 
 ```bash
-# Install Ollama (if not already installed)
-# See https://ollama.com for installation instructions
-
-# Pull the qwen3:8b model
-ollama pull qwen3:8b
-
-# Verify Ollama is running
-curl http://localhost:11434/api/tags
+python -m venv venv
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate
 ```
 
-## Running the Application
-
-### Start the A2A Server
+Install dependencies:
 
 ```bash
-# Install dependencies
 pip install -r requirements.txt
-
-# Run the server
-python server/main.py
 ```
 
-The server will start on `http://localhost:8080`
+### Local LLM Services
 
-### Test the Translation Service
+| Service       | Installation                              | Verification                                                     |
+| ------------- | ----------------------------------------- | ---------------------------------------------------------------- |
+| **Ollama**    | [Download](https://ollama.com/install.sh) | `curl -s http://localhost:11434/api/tags \| jq '.models[].name'` |
+| **LM Studio** | [Download](https://lmstudio.ai/)          | `curl -s http://localhost:1234/v1/models \| jq '.data[].id'`     |
 
-```bash
-# Run the test client
-python test_ollama_translation.py
+## Remote & Host Agent List
+
+| Agent                   | Framework       | Port  | Purpose                              |
+| :---------------------- | :-------------- | :---- | :----------------------------------- |
+| **Currency Agent**      | LangGraph       | 10000 | Real-time currency conversion        |
+| **YouTube Agent**       | AG2 + MCP       | 10010 | Video transcript analysis            |
+| **Reimbursement Agent** | Google ADK      | 10020 | Expense processing with forms        |
+| **Travel Agent**        | Semantic Kernel | 10030 | Trip planning with currency          |
+| **File Chat Agent**     | LlamaIndex      | 10040 | Document parsing & Q&A               |
+| **Host Agent**          | Google ADK      | -     | Task orchestration & agent selection |
+
+## Remote Agents
+
+### 1 Currency Agent
+
+#### Langgraph API
+
+<https://python.langchain.com/docs/integrations/providers/openai/>
+
+`remotes/langgraph/agent.py`
+
+```python
+class CurrencyAgent:
+    self.model = ChatOpenAI(
+        model=model_name,
+        base_url=base_url,
+    )
 ```
 
-### Use the A2A Client
+#### Tools of Currency Agent
 
-```bash
-# Run the example client
-python client/main.py
+[frankfurter](https://github.com/lineofflight/frankfurter)
+
+```sh
+http -b https://api.frankfurter.dev/v1/currencies
 ```
 
-## API Endpoints
-
-- `GET /.well-known/agent-card` - Get agent information
-- `POST /a2a` - Send A2A tasks
-- `POST /a2a/stream` - Send A2A tasks with streaming response
-
-## Implementation Details
-
-The server now uses:
-
-- **httpx**: Async HTTP client for Ollama API calls
-- **Ollama API**: Direct calls to `http://localhost:11434/api/generate`
-- **qwen3:8b model**: Specified in the API request payload
-
-### Key Configuration Changes
-
-1. **server/main.py**:
-
-   - Removed OpenAI client dependencies
-   - Added direct Ollama HTTP client implementation
-   - Modified task handlers to use Ollama API
-
-2. **requirements.txt**:
-
-   - Removed OpenAI SDK dependencies
-   - Kept core FastAPI and HTTP functionality
-
-3. **config/config.py**:
-   - Removed OpenAI configuration
-   - Added Ollama endpoint configuration
-
-## Error Handling
-
-The implementation includes proper error handling for:
-
-- Ollama service connectivity issues
-- Invalid API responses
-- Model generation timeouts
-- JSON parsing errors
-
-## Performance Considerations
-
-- Async HTTP client with configurable timeouts (30s connect, 2min request)
-- Non-streaming API calls for simplicity
-- Concurrent request handling via FastAPI
-
-## Testing
-
-Run the test suite:
-
-```bash
-pytest
+```sh
+http -b "https://api.frankfurter.dev/v1/latest?from=USD&to=CNY&amount=100"
+http -b "https://api.frankfurter.app/latest?from=USD&to=CNY&amount=100"
 ```
 
-The test client demonstrates basic translation functionality with local Ollama integration.
-
----
-
-## Original Project Structure (Reference)
-
-The following sections contain the original project documentation for reference:
+#### Start Currency Agent
 
 ```bash
 # With LM Studio
@@ -1001,7 +971,63 @@ Task status: completed
 2025-06-02: 100.0 USD = 719.98 CNY (1 USD = 7.1998 CNY)
 ```
 
-## Host Agent
+## Host Agent Cli
+
+```bash
+$ echo "Convert 100 USD to CNY\nquit" | python -m hosts.cli.host_agent_cli
+
+🔧 Manual mode: Agents should be started separately
+📋 Registered agent: Currency Agent
+   Description: Helps with exchange rates for currencies
+   URL: http://localhost:10000
+📋 Registered agent: YouTube Captions Agent
+   Description: AI agent that can extract closed captions and transcripts from YouTube videos. This agent provides raw transcription data that can be used for further processing.
+   URL: http://localhost:10010
+📋 Registered agent: Reimbursement Agent
+   Description: This agent handles the reimbursement process for the employees given the amount and purpose of the reimbursement.
+   URL: http://localhost:10020
+📋 Registered agent: SK Travel Agent
+   Description: Semantic Kernel-based travel agent providing comprehensive trip planning services including currency exchange and personalized activity planning.
+   URL: http://localhost:10030
+📋 Registered agent: Parse and Chat
+   Description: Parses a file and then chats with a user using the parsed content as context.
+   URL: http://localhost:10040
+
+🎉 Host Agent CLI Ready!
+As a host agent, I can help you communicate with remote agents.
+Type your queries below. Type 'quit' or ':q' to exit.
+Type 'agents' to list available remote agents.
+------------------------------------------------------------
+
+💬 Your query:
+🤔 Analyzing query: 'Convert 100 USD to CNY'
+🔍 Available agents:
+   - Currency Agent: Helps with exchange rates for currencies
+   - YouTube Captions Agent: AI agent that can extract closed captions and transcripts from YouTube videos. This agent provides raw transcription data that can be used for further processing.
+   - Reimbursement Agent: This agent handles the reimbursement process for the employees given the amount and purpose of the reimbursement.
+   - SK Travel Agent: Semantic Kernel-based travel agent providing comprehensive trip planning services including currency exchange and personalized activity planning.
+   - Parse and Chat: Parses a file and then chats with a user using the parsed content as context.
+🎯 Selected agent: Currency Agent
+📤 Sending message to Currency Agent...
+🌊 Using streaming communication...
+📨 Received event type: Task
+
+📋 Currency Agent task:
+   Task ID: ceecbc9a-a27a-43b0-b92e-12199c2ade6c
+   Status: TaskState.submitted
+📨 Received event type: TaskStatusUpdateEvent
+   📊 Task Status Update: message=Message(contextId='bc8fed4b-f360-491b-b133-6b7eb376a476', kind='message', messageId='d4e9e7d0-4736-47e3-bd61-7c25bdeca8b5', metadata=None, parts=[Part(root=TextPart(kind='text', metadata=None, text='正在查询汇率...'))], referenceTaskIds=None, role=<Role.agent: 'agent'>, taskId='ceecbc9a-a27a-43b0-b92e-12199c2ade6c') state=<TaskState.working: 'working'> timestamp=None
+📨 Received event type: TaskStatusUpdateEvent
+   📊 Task Status Update: message=Message(contextId='bc8fed4b-f360-491b-b133-6b7eb376a476', kind='message', messageId='b9143c01-f7c8-45d5-b3c4-664691890e78', metadata=None, parts=[Part(root=TextPart(kind='text', metadata=None, text='正在处理汇率数据...'))], referenceTaskIds=None, role=<Role.agent: 'agent'>, taskId='ceecbc9a-a27a-43b0-b92e-12199c2ade6c') state=<TaskState.working: 'working'> timestamp=None
+📨 Received event type: TaskArtifactUpdateEvent
+   📎 Task Artifact Update: Unknown
+      Artifact: conversion_result
+         Content: 2025-06-05: 100.0 USD = 717.92 CNY (Exchange Rate: 1 USD = 7.1792 CNY)
+📨 Received event type: TaskStatusUpdateEvent
+   📊 Task Status Update: message=None state=<TaskState.completed: 'completed'> timestamp=None
+```
+
+## Host Agent WebUI
 
 ```bash
 ./start_host_agent.sh
