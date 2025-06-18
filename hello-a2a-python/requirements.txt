@@ -54,7 +54,7 @@ httpx-aiohttp==0.1.6
 httpx-sse==0.4.0
 requests==2.32.4
 requests-toolbelt==1.0.0
-urllib3==2.4.0
+urllib3==2.5.0
 websockets==15.0.1
 
 # Data Processing & ML
