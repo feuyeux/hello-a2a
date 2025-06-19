@@ -29,7 +29,7 @@ google-cloud-aiplatform==1.97.0
 google-cloud-bigquery==3.34.0
 google-cloud-core==2.4.3
 google-cloud-resource-manager==1.14.2
-google-cloud-secret-manager==2.23.3
+google-cloud-secret-manager==2.24.0
 google-cloud-speech==2.33.0
 google-cloud-storage==3.1.1
 google-cloud-trace==1.16.2
