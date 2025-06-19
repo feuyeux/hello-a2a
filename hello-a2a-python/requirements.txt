@@ -178,7 +178,7 @@ docker==7.1.0
 docstring_parser==0.16
 fsspec==2025.5.1
 ghp-import==2.1.0
-graphviz==0.20.3
+graphviz==0.21
 hf-xet==1.1.4
 importlib_metadata==8.7.0
 jsonpatch==1.33
