@@ -66,7 +66,7 @@ huggingface-hub==0.33.0
 
 # MCP & Tools
 mcp==1.9.1
-litellm==1.72.1
+litellm==1.72.6.post2
 
 # Authentication & Security
 Authlib==1.6.0
