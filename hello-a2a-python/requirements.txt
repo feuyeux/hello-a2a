@@ -62,7 +62,7 @@ numpy==2.2.6
 pandas==2.3.0
 tiktoken==0.9.0
 tokenizers==0.21.1
-huggingface-hub==0.33.0
+huggingface-hub==0.33.1
 
 # MCP & Tools
 mcp==1.9.1
