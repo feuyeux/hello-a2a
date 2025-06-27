@@ -41,7 +41,7 @@ googleapis-common-protos==1.70.0
 # Web Framework & API
 fastapi==0.115.14
 uvicorn==0.34.3
-starlette==0.47.0
+starlette==0.47.1
 sse-starlette==2.3.6
 Flask==3.1.1
 mesop==1.0.1
