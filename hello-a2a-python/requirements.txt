@@ -151,7 +151,7 @@ jiter==0.10.0
 multidict==6.5.1
 packaging==25.0
 platformdirs==4.3.8
-propcache==0.3.1
+propcache==0.3.2
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pycparser==2.22
