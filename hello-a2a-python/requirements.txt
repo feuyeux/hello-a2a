@@ -115,7 +115,7 @@ Jinja2==3.1.6
 MarkupSafe==3.0.2
 Markdown==3.8
 regex==2024.11.6
-Pygments==2.19.1
+Pygments==2.19.2
 
 # Date & Time
 python-dateutil==2.9.0.post0
