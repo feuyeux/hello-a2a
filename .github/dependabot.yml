@@ -1,18 +1,37 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "hello-a2a-python"
+    directory: "/hello-a2a-python"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    target-branch: "main"
+
   - package-ecosystem: "maven"
-    directory: "hello-a2a-java"
+    directory: "/hello-a2a-java"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    target-branch: "main"
+
   - package-ecosystem: "gomod"
-    directory: "hello-a2a-go"
+    directory: "/hello-a2a-go"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    target-branch: "main"
+
   - package-ecosystem: "npm"
-    directory: "hello-a2a-js"
+    directory: "/hello-a2a-js"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    target-branch: "main"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    target-branch: "main"

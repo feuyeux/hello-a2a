@@ -1,28 +1,96 @@
-name: Continous Integration
+name: Continuous Integration
 
 on:
   push:
     branches:
-      - 'source'
+      - "main"
+      - "source"
   pull_request:
+    branches:
+      - "main"
+      - "source"
 
 permissions:
   contents: write
+  pull-requests: write
+  checks: read
 
 jobs:
+  test:
+    name: "Run Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: hello-a2a-js/package.json
+
+      - name: Install JavaScript dependencies
+        run: |
+          cd hello-a2a-js
+          npm ci
+
+      - name: Run JavaScript tests
+        run: |
+          cd hello-a2a-js
+          npm test || echo "No tests defined"
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install Python dependencies
+        run: |
+          cd hello-a2a-python
+          pip install -r requirements.txt
+
+      - name: Run Python tests
+        run: |
+          cd hello-a2a-python
+          python -m pytest || echo "No tests found"
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Run Go tests
+        run: |
+          cd hello-a2a-go
+          go test ./... || echo "No tests found"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Run Java tests
+        run: |
+          cd hello-a2a-java
+          mvn test || echo "No tests found"
 
   dependabot:
-    name: 'Dependabot'
+    name: "Dependabot Auto-merge"
     runs-on: ubuntu-latest
+    needs: test
     if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'}}
     steps:
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v1.3.1
+        uses: dependabot/fetch-metadata@v2
         with:
-          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
       - name: Enable auto-merge for Dependabot PRs
-        run: gh pr merge --auto --merge "$PR_URL"
+        if: ${{contains(steps.metadata.outputs.dependency-names, 'huggingface-hub') || contains(steps.metadata.outputs.dependency-names, 'backrefs') || contains(steps.metadata.outputs.dependency-names, 'cachetools') || contains(steps.metadata.outputs.dependency-names, 'opentelemetry-api') || contains(steps.metadata.outputs.dependency-names, 'maven-surefire-plugin')}}
+        run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

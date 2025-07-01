@@ -1,0 +1,38 @@
+name: Enable Auto-merge for Existing PRs
+
+on:
+  workflow_dispatch: # Allows manual trigger
+  schedule:
+    - cron: "0 */6 * * *" # Run every 6 hours
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  enable-automerge:
+    name: "Enable Auto-merge for Dependabot PRs"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Enable auto-merge for open dependabot PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get all open pull requests created by dependabot
+          prs=$(gh pr list --author "dependabot[bot]" --state open --json number,title,url)
+
+          # Loop through each PR and enable auto-merge
+          echo "$prs" | jq -r '.[] | @base64' | while read -r pr; do
+            pr_data=$(echo "$pr" | base64 --decode)
+            pr_number=$(echo "$pr_data" | jq -r '.number')
+            pr_title=$(echo "$pr_data" | jq -r '.title')
+            pr_url=$(echo "$pr_data" | jq -r '.url')
+            
+            echo "Enabling auto-merge for PR #$pr_number: $pr_title"
+            
+            # Enable auto-merge with squash strategy
+            gh pr merge "$pr_number" --auto --squash || echo "Failed to enable auto-merge for PR #$pr_number"
+          done
