@@ -95,7 +95,7 @@ pyyaml_env_tag==1.1
 # Async & Concurrency
 anyio==4.9.0
 asyncer==0.0.8
-aiosignal==1.3.2
+aiosignal==1.4.0
 sniffio==1.3.1
 
 # Utilities
