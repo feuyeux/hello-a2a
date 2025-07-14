@@ -70,7 +70,7 @@ litellm==1.73.6
 
 # Authentication & Security
 Authlib==1.6.0
-cryptography==45.0.4
+cryptography==45.0.5
 jwcrypto==1.5.6
 PyJWT==2.10.1
 
