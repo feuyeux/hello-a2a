@@ -166,7 +166,7 @@ yarl==1.20.1
 zipp==3.23.0
 
 # Specialized Tools
-absl-py==2.3.0
+absl-py==2.3.1
 babel==2.17.0
 backrefs==5.8
 blinker==1.9.0
