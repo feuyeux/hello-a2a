@@ -176,7 +176,7 @@ Deprecated==1.2.18
 distro==1.9.0
 docker==7.1.0
 docstring_parser==0.16
-fsspec==2025.5.1
+fsspec==2025.7.0
 ghp-import==2.1.0
 graphviz==0.21
 hf-xet==1.1.5
