@@ -77,7 +77,7 @@ PyJWT==2.10.1
 # Data Validation & Serialization
 pydantic==2.11.7
 pydantic-settings==2.10.1
-pydantic_core==2.34.1
+pydantic_core==2.39.0
 jsonschema==4.24.0
 jsonschema-specifications==2025.4.1
 orjson==3.10.18
