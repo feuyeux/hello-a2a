@@ -130,7 +130,7 @@ opentelemetry-sdk==1.34.1
 
 # Protocol & RPC
 grpcio==1.74.0
-grpcio-status==1.73.0
+grpcio-status==1.74.0
 grpc-google-iam-v1==0.14.2
 protobuf==6.31.1
 proto-plus==1.26.1
