@@ -175,7 +175,7 @@ deepdiff==8.5.0
 Deprecated==1.2.18
 distro==1.9.0
 docker==7.1.0
-docstring_parser==0.16
+docstring_parser==0.17.0
 fsspec==2025.7.0
 ghp-import==2.1.0
 graphviz==0.21
