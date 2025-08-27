@@ -43,7 +43,7 @@ fastapi==0.116.1
 uvicorn==0.35.0
 starlette==0.47.2
 sse-starlette==3.0.2
-Flask==3.1.1
+Flask==3.1.2
 mesop==1.0.1
 
 # HTTP & Networking
