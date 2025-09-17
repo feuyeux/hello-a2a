@@ -20,7 +20,7 @@ semantic-kernel==1.32.2
 
 # Google Cloud & ADK
 google-adk==1.14.1
-google-ai-generativelanguage==0.6.18
+google-ai-generativelanguage==0.7.0
 google-api-core==2.25.1
 google-api-python-client==2.181.0
 google-auth==2.40.3
