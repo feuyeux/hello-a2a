@@ -4,7 +4,7 @@ a2a-sdk==0.2.4
 # AI/ML Frameworks
 langchain==0.3.26
 langchain-core==0.3.68
-langchain-google-genai==2.1.6
+langchain-google-genai==2.1.12
 langchain-openai==0.3.28
 langchain-text-splitters==0.3.9
 langgraph==0.6.6
