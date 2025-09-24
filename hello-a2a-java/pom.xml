@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.3</version>
+        <version>3.5.5</version>
         <relativePath/>
     </parent>
-    <groupId>com.google.a2a</groupId>
-    <artifactId>a2a</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <groupId>io.github.a2asdk</groupId>
+    <artifactId>hello-a2a</artifactId>
+    <version>0.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>a2a-parent</name>
@@ -19,6 +19,7 @@
         <module>model</module>
         <module>client</module>
         <module>server</module>
+        <module>examples</module>
     </modules>
 
     <properties>
@@ -26,7 +27,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
         <junit.version>5.10.2</junit.version>
     </properties>
 

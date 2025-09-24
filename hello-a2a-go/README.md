@@ -1,6 +1,6 @@
-# A2A Go Example with Ollama Integration
+# A2A Go Example with Ollama Integration (v0.3.0 Compliant)
 
-This project demonstrates the A2A (Agent2Agent) protocol implementation in Go, integrated with local Ollama qwen3:8b model for translation services.
+This project demonstrates the A2A (Agent2Agent) protocol implementation in Go, updated to support A2A v0.3.0 specification and integrated with local Ollama qwen3:8b model for translation services.
 
 ## Architecture
 
@@ -14,11 +14,13 @@ This project demonstrates the A2A (Agent2Agent) protocol implementation in Go, i
 
 This implementation provides:
 
-1. **Full A2A Protocol Support**: Complete JSON-RPC over HTTP implementation
+1. **A2A v0.3.0 Protocol Support**: Complete JSON-RPC over HTTP implementation with latest method names
 2. **Local Ollama Integration**: Direct HTTP calls to local Ollama API (qwen3:8b model)
 3. **Translation Service**: Multi-language translation capabilities
 4. **Streaming Support**: Both regular and streaming response modes
 5. **Agent Discovery**: Standard `.well-known/agent-card` endpoint
+6. **Backwards Compatibility**: Legacy method names maintained for smooth migration
+7. **Improved Error Handling**: Enhanced error recovery and timeout management
 
 ## Prerequisites
 
@@ -85,9 +87,15 @@ func main() {
 
 ## API Endpoints
 
-- `GET /.well-known/agent-card` - Get agent information and capabilities
-- `POST /a2a` - Send A2A tasks (JSON-RPC format)
-- `POST /a2a/stream` - Send A2A tasks with streaming response
+- `GET /.well-known/agent-card` - Get agent information and capabilities (A2A v0.3.0 compliant)
+- `POST /a2a` - Send A2A messages using `message/send` method (JSON-RPC format)
+- `POST /a2a/stream` - Send A2A messages with streaming response using `message/stream`
+
+### Legacy Support
+The following methods are also supported for backwards compatibility:
+- `tasks/send` - Mapped to `message/send`
+- `tasks/get` - Mapped to `message/list`
+- `tasks/cancel` - Mapped to `message/pending`
 
 ## Example Translation Results
 

@@ -1,20 +1,31 @@
-# A2A Java Example with Ollama Integration
+# A2A Java Example with Ollama Integration (v0.3.0 Compliant)
 
-This project demonstrates the A2A (Agent2Agent) protocol implementation in Java, modified to use local Ollama qwen3:8b model instead of remote OpenAI services.
+This project demonstrates the A2A (Agent2Agent) protocol implementation in Java, refactored to support A2A v0.3.0 specification and modified to use local Ollama qwen3:8b model instead of remote OpenAI services.
 
 ## Architecture
 
-- **Model**: Data models for A2A protocol messages and types
-- **Client**: A2A client implementation for sending requests to A2A servers
+- **Model**: Data models for A2A protocol messages and types (A2A v0.3.0 compliant)
+- **Client**: Consolidated A2A client implementation with both new and legacy method support
+  - Core client: `A2AClient.java`
+  - Utilities: Moved to `client/util/` package
+  - Examples: Moved to `examples/` directory
 - **Server**: A2A server implementation using Spring Boot with local Ollama integration
 
 ## Key Changes
 
-The original implementation used Spring AI with OpenAI APIs. This has been modified to:
+The original implementation has been modernized and refactored to:
 
-1. **Direct HTTP calls to Ollama**: Replaced Spring AI ChatModel with direct HTTP client calls to local Ollama API
-2. **Local qwen3:8b model**: Uses the qwen3:8b model running on Ollama
-3. **Removed dependencies**: Eliminated Spring AI dependencies from the project
+1. **A2A v0.3.0 Compliance**: Updated to use latest A2A protocol methods (`message/send`, `message/list`, `message/stream`)
+2. **Official A2A Java SDK Integration**: 
+   - Server: Uses `io.github.a2asdk:a2a-java-sdk-reference-jsonrpc:0.3.0.Beta1`
+   - Client: Uses `io.github.a2asdk:a2a-java-sdk-client:0.3.0.Beta1`
+   - Specification: Uses `io.github.a2asdk:a2a-java-sdk-spec:0.3.0.Beta1`
+3. **Direct HTTP calls to Ollama**: Replaced Spring AI ChatModel with direct HTTP client calls to local Ollama API
+4. **Local qwen3:8b model**: Uses the qwen3:8b model running on Ollama
+5. **Consolidated Client Architecture**: Single main client class with utilities and examples properly organized
+6. **Backwards Compatibility**: Legacy method names maintained for smooth migration
+7. **Updated Dependencies**: Jackson updated to latest version, official A2A SDK dependencies
+8. **Proper Agent Card Endpoint**: Uses `.well-known/agent-card` as per A2A v0.3.0 specification
 
 ## Prerequisites
 
@@ -62,25 +73,34 @@ java -cp ".:client/target/classes:model/target/classes:client/target/dependency/
 ### Use the A2A Client
 
 ```bash
-# Run the example client
-mvn exec:java -Dexec.mainClass="com.google.a2a.client.A2AClientExample" -pl client
+# Run the example client (moved to examples directory)
+mvn exec:java -Dexec.mainClass="com.google.a2a.examples.A2AClientExample" -pl examples
 ```
 
 ### Use Host Agent Cli
 
 ```bash
 cd hello-a2a-java
-mvn exec:java -Dexec.mainClass="com.google.a2a.client.HostAgentCli" -Dexec.args="--auto-start" -pl client
-
-
-Convert 100 USD to CNY
+mvn exec:java -Dexec.mainClass="com.google.a2a.examples.HostAgentCli" -Dexec.args="--auto-start" -pl examples
 ```
 
 ## API Endpoints
 
-- `GET /.well-known/agent-card` - Get agent information
-- `POST /a2a` - Send A2A tasks
-- `POST /a2a/stream` - Send A2A tasks with streaming response
+- `GET /.well-known/agent-card` - Get agent information (A2A v0.3.0 compliant)
+- `POST /a2a` - Send A2A messages using `message/send` method
+- `POST /a2a/stream` - Send A2A messages with streaming response using `message/stream`
+
+### Client Methods
+
+**New A2A v0.3.0 Methods:**
+- `sendMessage(MessageSendParams)` - Send messages using latest protocol
+- `listMessages(TaskQueryParams)` - List messages
+- `sendMessageStreaming(MessageSendParams, StreamingEventListener)` - Streaming message sending
+
+**Legacy Methods (backwards compatibility):**
+- `sendTask(TaskSendParams)` - Mapped to `sendMessage`
+- `getTask(TaskQueryParams)` - Mapped to `listMessages`
+- `sendTaskStreaming(TaskSendParams, StreamingEventListener)` - Mapped to `sendMessageStreaming`
 
 ## Implementation Details
 
@@ -131,3 +151,8 @@ mvn test
 ```
 
 The test client (`TestOllamaTranslation.java`) demonstrates basic translation functionality.
+
+----
+
+- https://github.com/a2aproject/A2A
+- https://a2a-protocol.org/latest

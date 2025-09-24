@@ -11,24 +11,24 @@ import (
 	"a2a/models"
 )
 
-// Client represents an A2A protocol client
+// Client represents an A2A protocol client (v0.3.0 compliant)
 type Client struct {
 	baseURL    string
 	httpClient *http.Client
 }
 
-// NewClient creates a new A2A client
+// NewClient creates a new A2A client (v0.3.0 compliant)
 func NewClient(baseURL string) *Client {
 	return &Client{
 		baseURL: baseURL,
 		httpClient: &http.Client{
-			Timeout: 30 * time.Second,
+			Timeout: 60 * time.Second, // Increased timeout for Ollama processing
 		},
 	}
 }
 
-// SendTask sends a task message to the agent
-func (c *Client) SendTask(params models.TaskSendParams) (*models.JSONRPCResponse, error) {
+// SendMessage sends a message to the agent (A2A v0.3.0 compliant)
+func (c *Client) SendMessage(params models.MessageSendParams) (*models.JSONRPCResponse, error) {
 	req := models.JSONRPCRequest{
 		JSONRPCMessage: models.JSONRPCMessage{
 			JSONRPC: "2.0",
@@ -36,7 +36,7 @@ func (c *Client) SendTask(params models.TaskSendParams) (*models.JSONRPCResponse
 				ID: params.ID + "-request",
 			},
 		},
-		Method: "tasks/send",
+		Method: "message/send",
 		Params: params,
 	}
 
@@ -52,16 +52,43 @@ func (c *Client) SendTask(params models.TaskSendParams) (*models.JSONRPCResponse
 	return &resp, nil
 }
 
-// GetTask retrieves the status of a task
+// SendTask sends a task message to the agent (backwards compatibility)
+func (c *Client) SendTask(params models.TaskSendParams) (*models.JSONRPCResponse, error) {
+	// Convert TaskSendParams to MessageSendParams for compatibility
+	msgParams := models.MessageSendParams{
+		ID:      params.ID,
+		Message: params.Message,
+		Config:  nil, // TaskSendParams doesn't have config, set to nil
+	}
+	return c.SendMessage(msgParams)
+}
+
+// GetTask retrieves the status of a task (backwards compatibility)
 func (c *Client) GetTask(params models.TaskQueryParams) (*models.JSONRPCResponse, error) {
+	return c.ListMessages(params)
+}
+
+// SendTaskStreaming sends a task message and streams the response (backwards compatibility)
+func (c *Client) SendTaskStreaming(params models.TaskSendParams, eventChan chan<- interface{}) error {
+	// Convert TaskSendParams to MessageSendParams for compatibility
+	msgParams := models.MessageSendParams{
+		ID:      params.ID,
+		Message: params.Message,
+		Config:  nil, // TaskSendParams doesn't have config, set to nil
+	}
+	return c.SendMessageStreaming(msgParams, eventChan)
+}
+
+// ListMessages retrieves messages (A2A v0.3.0 compliant)
+func (c *Client) ListMessages(params models.TaskQueryParams) (*models.JSONRPCResponse, error) {
 	req := models.JSONRPCRequest{
 		JSONRPCMessage: models.JSONRPCMessage{
 			JSONRPC: "2.0",
 			JSONRPCMessageIdentifier: models.JSONRPCMessageIdentifier{
-				ID: params.ID + "-get-request",
+				ID: params.ID + "-list-request",
 			},
 		},
-		Method: "tasks/get",
+		Method: "message/list",
 		Params: params,
 	}
 
@@ -77,7 +104,7 @@ func (c *Client) GetTask(params models.TaskQueryParams) (*models.JSONRPCResponse
 	return &resp, nil
 }
 
-// CancelTask cancels a task
+// CancelTask cancels a task (A2A v0.3.0 compliant)
 func (c *Client) CancelTask(params models.TaskIDParams) (*models.JSONRPCResponse, error) {
 	req := models.JSONRPCRequest{
 		JSONRPCMessage: models.JSONRPCMessage{
@@ -86,7 +113,7 @@ func (c *Client) CancelTask(params models.TaskIDParams) (*models.JSONRPCResponse
 				ID: params.ID + "-cancel-request",
 			},
 		},
-		Method: "tasks/cancel",
+		Method: "message/pending",
 		Params: params,
 	}
 
@@ -102,8 +129,8 @@ func (c *Client) CancelTask(params models.TaskIDParams) (*models.JSONRPCResponse
 	return &resp, nil
 }
 
-// SendTaskStreaming sends a task message and streams the response
-func (c *Client) SendTaskStreaming(params models.TaskSendParams, eventChan chan<- interface{}) error {
+// SendMessageStreaming sends a message and streams the response (A2A v0.3.0 compliant)
+func (c *Client) SendMessageStreaming(params models.MessageSendParams, eventChan chan<- interface{}) error {
 	req := models.JSONRPCRequest{
 		JSONRPCMessage: models.JSONRPCMessage{
 			JSONRPC: "2.0",
@@ -111,7 +138,7 @@ func (c *Client) SendTaskStreaming(params models.TaskSendParams, eventChan chan<
 				ID: params.ID + "-stream-request",
 			},
 		},
-		Method: "tasks/send",
+		Method: "message/stream",
 		Params: params,
 	}
 
@@ -140,7 +167,7 @@ func (c *Client) SendTaskStreaming(params models.TaskSendParams, eventChan chan<
 
 	decoder := json.NewDecoder(httpResp.Body)
 	for {
-		var event models.SendTaskStreamingResponse
+		var event models.SendMessageStreamingResponse
 		if err := decoder.Decode(&event); err != nil {
 			if err == io.EOF {
 				break
@@ -213,4 +240,31 @@ func (c *Client) doRequest(req interface{}, resp *models.JSONRPCResponse) error 
 	}
 
 	return nil
+}
+
+// GetAgentCard retrieves the agent card from the well-known endpoint (A2A v0.3.0 compliant)
+func (c *Client) GetAgentCard() (*models.AgentCard, error) {
+	httpReq, err := http.NewRequest("GET", c.baseURL+"/.well-known/agent-card", nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	httpReq.Header.Set("Accept", "application/json")
+
+	httpResp, err := c.httpClient.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", httpResp.StatusCode)
+	}
+
+	var agentCard models.AgentCard
+	if err := json.NewDecoder(httpResp.Body).Decode(&agentCard); err != nil {
+		return nil, fmt.Errorf("failed to decode agent card: %w", err)
+	}
+
+	return &agentCard, nil
 }

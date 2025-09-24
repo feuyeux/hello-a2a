@@ -1,8 +1,8 @@
-# Hello Agent2Agent (A2A) Protocol with Ollama Integration
+# Hello Agent2Agent (A2A) Protocol v0.3.0 with Ollama Integration
 
-> **A local implementation of Google's Agent2Agent (A2A) Protocol using Ollama qwen3:8b model**
+> **A modernized implementation of Google's Agent2Agent (A2A) Protocol v0.3.0 using Ollama qwen3:8b model**
 
-This repository contains A2A protocol implementations in multiple programming languages, all configured to use local Ollama instead of remote AI services.
+This repository contains refactored A2A protocol implementations in multiple programming languages, all updated to support the latest A2A v0.3.0 specification and configured to use local Ollama instead of remote AI services.
 
 ## Language Implementations
 
@@ -31,13 +31,16 @@ curl http://localhost:11434/api/tags
 
 ## Key Features
 
+- **A2A v0.3.0 Compliance**: Full compliance with the latest A2A specification including `message/send`, `message/list`, and `message/stream` methods
+- **Modernized Architecture**: Streamlined client implementations with reduced code duplication
 - **Local AI Processing**: All implementations use local Ollama instead of cloud services
 - **Unified Model**: All languages use the same qwen3:8b model for consistency
-- **A2A Protocol Compliance**: Full compliance with Google's A2A specification
+- **Backwards Compatibility**: Legacy method names still supported for smooth migration
 - **Multi-Language Support**: Choose your preferred programming language
 
 ## Resources
 
-- 🔗 [A2A Specification and Documentation](https://github.com/google/A2A)
-- 🔗 [Agent2Agent (A2A) Samples](https://github.com/google-a2a/a2a-samples)
-- 🔗 [A2A Python SDK](https://github.com/google/a2a-python)
+- 🔗 [A2A Protocol v0.3.0 Specification](https://a2a-protocol.org/latest/)
+- 🔗 [Official A2A SDK Documentation](https://a2a-protocol.org/latest/sdk/)
+- 🔗 [A2A Java SDK (io.github.a2asdk)](https://github.com/a2a-protocol/a2a-java-sdk)
+- 🔗 [A2A Protocol Examples and Samples](https://github.com/a2a-protocol/samples)

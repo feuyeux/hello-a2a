@@ -69,3 +69,12 @@ type GetTaskPushNotificationResponse struct {
 	Result *PushNotificationConfig `json:"result,omitempty"`
 	Error  *A2AError               `json:"error,omitempty"`
 }
+
+// SendMessageStreamingResponse represents a streaming response for message sending (A2A v0.3.0)
+type SendMessageStreamingResponse struct {
+	JSONRPCMessage
+	// Error contains error information if the operation failed
+	Error *JSONRPCError `json:"error,omitempty"`
+	// Result contains the streaming update result
+	Result interface{} `json:"result,omitempty"`
+}

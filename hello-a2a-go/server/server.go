@@ -65,15 +65,16 @@ func (s *A2AServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch req.Method {
+	// Legacy A2A methods (backwards compatibility)
 	case "tasks/send":
 		var params models.TaskSendParams
 		paramsBytes, err := json.Marshal(req.Params)
 		if err != nil {
-			s.sendError(w, req.ID.(string), models.ErrorCodeInvalidRequest, "Invalid parameters")
+			s.sendErrorWithID(w, req.ID, models.ErrorCodeInvalidRequest, "Invalid parameters")
 			return
 		}
 		if err := json.Unmarshal(paramsBytes, &params); err != nil {
-			s.sendError(w, req.ID.(string), models.ErrorCodeInvalidRequest, "Invalid parameters")
+			s.sendErrorWithID(w, req.ID, models.ErrorCodeInvalidRequest, "Invalid parameters")
 			return
 		}
 
@@ -83,13 +84,64 @@ func (s *A2AServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		s.handleTaskSend(w, &req, req.ID.(string))
+		s.handleTaskSendWithID(w, &req, req.ID)
 	case "tasks/get":
-		s.handleTaskGet(w, &req, req.ID.(string))
+		s.handleTaskGetWithID(w, &req, req.ID)
 	case "tasks/cancel":
-		s.handleTaskCancel(w, &req, req.ID.(string))
+		s.handleTaskCancelWithID(w, &req, req.ID)
+	// A2A v0.3.0 methods
+	case "message/send":
+		// Convert MessageSendParams to TaskSendParams for compatibility
+		var msgParams models.MessageSendParams
+		paramsBytes, err := json.Marshal(req.Params)
+		if err != nil {
+			s.sendErrorWithID(w, req.ID, models.ErrorCodeInvalidRequest, "Invalid parameters")
+			return
+		}
+		if err := json.Unmarshal(paramsBytes, &msgParams); err != nil {
+			s.sendErrorWithID(w, req.ID, models.ErrorCodeInvalidRequest, "Invalid parameters")
+			return
+		}
+
+		// Convert to TaskSendParams
+		taskParams := models.TaskSendParams{
+			ID:      msgParams.ID,
+			Message: msgParams.Message,
+		}
+
+		// Check if client wants streaming response
+		if r.Header.Get("Accept") == "text/event-stream" {
+			s.handleStreamingTask(w, r, taskParams)
+			return
+		}
+
+		// Update request params for legacy handler
+		req.Params = taskParams
+		s.handleTaskSendWithID(w, &req, req.ID)
+	case "message/list":
+		s.handleTaskGetWithID(w, &req, req.ID)
+	case "message/stream":
+		// Convert MessageSendParams to TaskSendParams for compatibility
+		var msgParams models.MessageSendParams
+		paramsBytes, err := json.Marshal(req.Params)
+		if err != nil {
+			s.sendErrorWithID(w, req.ID, models.ErrorCodeInvalidRequest, "Invalid parameters")
+			return
+		}
+		if err := json.Unmarshal(paramsBytes, &msgParams); err != nil {
+			s.sendErrorWithID(w, req.ID, models.ErrorCodeInvalidRequest, "Invalid parameters")
+			return
+		}
+
+		// Convert to TaskSendParams
+		taskParams := models.TaskSendParams{
+			ID:      msgParams.ID,
+			Message: msgParams.Message,
+		}
+
+		s.handleStreamingTask(w, r, taskParams)
 	default:
-		s.sendError(w, req.ID.(string), models.ErrorCodeMethodNotFound, "Method not found")
+		s.sendErrorWithID(w, req.ID, models.ErrorCodeMethodNotFound, "Method not found")
 	}
 }
 
@@ -221,8 +273,135 @@ func (s *A2AServer) sendError(w http.ResponseWriter, id string, code models.Erro
 	json.NewEncoder(w).Encode(response)
 }
 
+// sendErrorWithID sends a JSON-RPC error response with flexible ID handling
+func (s *A2AServer) sendErrorWithID(w http.ResponseWriter, id interface{}, code models.ErrorCode, message string) {
+	response := models.JSONRPCResponse{
+		JSONRPCMessage: models.JSONRPCMessage{
+			JSONRPC: "2.0",
+			JSONRPCMessageIdentifier: models.JSONRPCMessageIdentifier{
+				ID: id,
+			},
+		},
+		Error: &models.JSONRPCError{
+			Code:    int(code),
+			Message: message,
+		},
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// sendResponseWithID sends a JSON-RPC response with flexible ID handling
+func (s *A2AServer) sendResponseWithID(w http.ResponseWriter, id interface{}, result interface{}) {
+	response := models.JSONRPCResponse{
+		JSONRPCMessage: models.JSONRPCMessage{
+			JSONRPC: "2.0",
+			JSONRPCMessageIdentifier: models.JSONRPCMessageIdentifier{
+				ID: id,
+			},
+		},
+		Result: result,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// handleTaskSendWithID handles the tasks/send method with flexible ID handling
+func (s *A2AServer) handleTaskSendWithID(w http.ResponseWriter, req *models.JSONRPCRequest, id interface{}) {
+	var params models.TaskSendParams
+	paramsBytes, err := json.Marshal(req.Params)
+	if err != nil {
+		s.sendErrorWithID(w, id, models.ErrorCodeInvalidRequest, "Invalid parameters")
+		return
+	}
+	if err := json.Unmarshal(paramsBytes, &params); err != nil {
+		s.sendErrorWithID(w, id, models.ErrorCodeInvalidRequest, "Invalid parameters")
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// Create new task
+	task := &models.Task{
+		ID: params.ID,
+		Status: models.TaskStatus{
+			State: models.TaskStateWorking,
+		},
+	}
+
+	// Process task
+	updatedTask, err := s.handler(task, &params.Message)
+	if err != nil {
+		s.sendErrorWithID(w, id, models.ErrorCodeInternalError, err.Error())
+		return
+	}
+
+	// Store task and history
+	s.taskStore[task.ID] = updatedTask
+	s.taskHistory[task.ID] = append(s.taskHistory[task.ID], &params.Message)
+
+	// Send response
+	s.sendResponseWithID(w, id, updatedTask)
+}
+
+// handleTaskGetWithID handles the tasks/get method with flexible ID handling
+func (s *A2AServer) handleTaskGetWithID(w http.ResponseWriter, req *models.JSONRPCRequest, id interface{}) {
+	var params models.TaskQueryParams
+	paramsBytes, err := json.Marshal(req.Params)
+	if err != nil {
+		s.sendErrorWithID(w, id, models.ErrorCodeInvalidRequest, "Invalid parameters")
+		return
+	}
+	if err := json.Unmarshal(paramsBytes, &params); err != nil {
+		s.sendErrorWithID(w, id, models.ErrorCodeInvalidRequest, "Invalid parameters")
+		return
+	}
+
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	task, exists := s.taskStore[params.ID]
+	if !exists {
+		s.sendErrorWithID(w, id, models.ErrorCodeTaskNotFound, "Task not found")
+		return
+	}
+
+	s.sendResponseWithID(w, id, task)
+}
+
+// handleTaskCancelWithID handles the tasks/cancel method with flexible ID handling
+func (s *A2AServer) handleTaskCancelWithID(w http.ResponseWriter, req *models.JSONRPCRequest, id interface{}) {
+	var params models.TaskIDParams
+	paramsBytes, err := json.Marshal(req.Params)
+	if err != nil {
+		s.sendErrorWithID(w, id, models.ErrorCodeInvalidRequest, "Invalid parameters")
+		return
+	}
+	if err := json.Unmarshal(paramsBytes, &params); err != nil {
+		s.sendErrorWithID(w, id, models.ErrorCodeInvalidRequest, "Invalid parameters")
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	task, exists := s.taskStore[params.ID]
+	if !exists {
+		s.sendErrorWithID(w, id, models.ErrorCodeTaskNotFound, "Task not found")
+		return
+	}
+
+	// Update task status to canceled
+	task.Status.State = models.TaskStateCanceled
+	s.taskStore[params.ID] = task
+
+	s.sendResponseWithID(w, id, task)
+}
+
 func (s *A2AServer) handleStreamingTask(w http.ResponseWriter, r *http.Request, params models.TaskSendParams) {
-	// Set headers for SSE
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")

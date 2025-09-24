@@ -1,5 +1,10 @@
 package models
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 // TaskState represents the state of a task within the A2A protocol
 type TaskState string
 
@@ -81,4 +86,130 @@ type AgentCard struct {
 	DefaultOutputModes []string `json:"defaultOutputModes,omitempty"`
 	// Skills is the list of specific skills offered by the agent
 	Skills []AgentSkill `json:"skills"`
+}
+
+// Message represents a message in the A2A protocol
+type Message struct {
+	Role  string `json:"role"`  // "user" or "agent"
+	Parts []Part `json:"parts"`
+}
+
+// UnmarshalJSON implements custom JSON unmarshaling for Message to handle Part interface
+func (m *Message) UnmarshalJSON(data []byte) error {
+	type Alias Message
+	aux := &struct {
+		Parts []json.RawMessage `json:"parts"`
+		*Alias
+	}{
+		Alias: (*Alias)(m),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	m.Parts = make([]Part, len(aux.Parts))
+	for i, partData := range aux.Parts {
+		// First, extract the kind field to determine the type
+		var partType struct {
+			Kind string `json:"kind"`
+		}
+		if err := json.Unmarshal(partData, &partType); err != nil {
+			return err
+		}
+
+		// Unmarshal to the appropriate concrete type based on kind
+		switch partType.Kind {
+		case "text":
+			var textPart TextPart
+			if err := json.Unmarshal(partData, &textPart); err != nil {
+				return err
+			}
+			m.Parts[i] = textPart
+		case "file":
+			var filePart FilePart
+			if err := json.Unmarshal(partData, &filePart); err != nil {
+				return err
+			}
+			m.Parts[i] = filePart
+		case "data":
+			var dataPart DataPart
+			if err := json.Unmarshal(partData, &dataPart); err != nil {
+				return err
+			}
+			m.Parts[i] = dataPart
+		default:
+			return fmt.Errorf("unknown part kind: %s", partType.Kind)
+		}
+	}
+
+	return nil
+}
+
+// Part represents a part of a message (text, file, or data)
+type Part interface {
+	GetPartType() string
+}
+
+// TextPart represents a text part of a message
+type TextPart struct {
+	Type string `json:"kind"` // "text"
+	Text string `json:"text"`
+}
+
+func (p TextPart) GetPartType() string {
+	return "text"
+}
+
+// FilePart represents a file part of a message
+type FilePart struct {
+	Type     string      `json:"kind"` // "file"
+	FileName string      `json:"fileName"`
+	MimeType string      `json:"mimeType"`
+	Content  FileContent `json:"content"`
+}
+
+func (p FilePart) GetPartType() string {
+	return "file"
+}
+
+// DataPart represents structured data part
+type DataPart struct {
+	Type string      `json:"kind"` // "data"
+	Data interface{} `json:"data"`
+}
+
+func (p DataPart) GetPartType() string {
+	return "data"
+}
+
+// FileContent represents file content (can be bytes or URI)
+type FileContent interface {
+	GetContentType() string
+}
+
+// FileContentBytes represents file content as bytes
+type FileContentBytes struct {
+	Type  string `json:"type"` // "bytes"
+	Bytes []byte `json:"bytes"`
+}
+
+func (c FileContentBytes) GetContentType() string {
+	return "bytes"
+}
+
+// FileContentURI represents file content as URI
+type FileContentURI struct {
+	Type string `json:"type"` // "uri"
+	URI  string `json:"uri"`
+}
+
+func (c FileContentURI) GetContentType() string {
+	return "uri"
+}
+
+// PushNotificationAuthenticationInfo represents authentication for push notifications
+type PushNotificationAuthenticationInfo struct {
+	Scheme      string      `json:"scheme"`
+	Credentials interface{} `json:"credentials,omitempty"`
 }

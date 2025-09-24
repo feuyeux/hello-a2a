@@ -39,9 +39,9 @@ func main() {
 		message := models.Message{
 			Role: "user",
 			Parts: []models.Part{
-				{
-					Type: stringPtr("text"),
-					Text: stringPtr(text),
+				models.TextPart{
+					Type: "text",
+					Text: text,
 				},
 			},
 		}
@@ -94,9 +94,9 @@ func main() {
 	streamingMessage := models.Message{
 		Role: "user",
 		Parts: []models.Part{
-			{
-				Type: stringPtr("text"),
-				Text: stringPtr("请将这段中文翻译成英文：今天天气真好！"),
+			models.TextPart{
+				Type: "text",
+				Text: "请将这段中文翻译成英文：今天天气真好！",
 			},
 		},
 	}

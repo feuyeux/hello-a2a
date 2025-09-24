@@ -182,3 +182,4 @@ Thumbs.db
 uv.lock
 *.bkp
 .vscode
+.qoder

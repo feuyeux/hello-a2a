@@ -1,4 +1,4 @@
-package com.google.a2a.client;
+package com.google.a2a.client.util;
 
 import java.io.IOException;
 import java.net.URI;

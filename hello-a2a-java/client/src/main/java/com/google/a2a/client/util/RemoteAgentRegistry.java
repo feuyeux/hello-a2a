@@ -1,7 +1,8 @@
-package com.google.a2a.client;
+package com.google.a2a.client.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.a2a.model.AgentCard;
+import com.google.a2a.client.A2AClient;
+import io.a2a.spec.AgentCard;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -36,7 +37,7 @@ public class RemoteAgentRegistry {
         try {
             // Get agent card
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url + "/.well-known/agent.json"))
+                .uri(URI.create(url + "/.well-known/agent-card"))
                 .header("Accept", "application/json")
                 .GET()
                 .build();
@@ -86,10 +87,10 @@ public class RemoteAgentRegistry {
     /**
      * List all registered agents
      */
-    public List<HostAgentCli.AgentInfo> listAgents() {
-        List<HostAgentCli.AgentInfo> agentInfoList = new ArrayList<>();
+    public List<AgentInfo> listAgents() {
+        List<AgentInfo> agentInfoList = new ArrayList<>();
         for (AgentCard card : agents.values()) {
-            agentInfoList.add(new HostAgentCli.AgentInfo(
+            agentInfoList.add(new AgentInfo(
                 card.name(),
                 card.description() != null ? card.description() : "No description",
                 card.url() != null ? card.url() : "unknown"
@@ -97,6 +98,15 @@ public class RemoteAgentRegistry {
         }
         return agentInfoList;
     }
+    
+    /**
+     * AgentInfo record for listing agents
+     */
+    public record AgentInfo(
+        String name,
+        String description,
+        String url
+    ) {}
     
     /**
      * Get an A2A client for a specific agent

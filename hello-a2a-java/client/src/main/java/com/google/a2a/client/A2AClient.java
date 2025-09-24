@@ -2,7 +2,7 @@ package com.google.a2a.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.a2a.model.*;
+import io.a2a.spec.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 
 /**
- * A2A protocol client implementation
+ * A2A protocol client implementation (v0.3.0 compliant)
  */
 public class A2AClient {
     
@@ -48,7 +48,25 @@ public class A2AClient {
     }
     
     /**
-     * Send a task message to the agent
+     * Send a message to the agent (A2A v0.3.0 compliant)
+     * 
+     * @param params message send parameters
+     * @return JSON-RPC response containing the task
+     * @throws A2AClientException if the request fails
+     */
+    public JSONRPCResponse sendMessage(MessageSendParams params) throws A2AClientException {
+        JSONRPCRequest request = new JSONRPCRequest(
+            generateRequestId(),
+            "2.0",
+            "message/send",
+            params
+        );
+        
+        return doRequest(request);
+    }
+    
+    /**
+     * Send a task message to the agent (backwards compatibility)
      * 
      * @param params task send parameters
      * @return JSON-RPC response containing the task
@@ -66,7 +84,25 @@ public class A2AClient {
     }
     
     /**
-     * Get the status of a task
+     * List messages (A2A v0.3.0 compliant)
+     * 
+     * @param params task query parameters
+     * @return JSON-RPC response containing the task
+     * @throws A2AClientException if the request fails
+     */
+    public JSONRPCResponse listMessages(TaskQueryParams params) throws A2AClientException {
+        JSONRPCRequest request = new JSONRPCRequest(
+            generateRequestId(),
+            "2.0",
+            "message/list",
+            params
+        );
+        
+        return doRequest(request);
+    }
+    
+    /**
+     * Get the status of a task (backwards compatibility)
      * 
      * @param params task query parameters
      * @return JSON-RPC response containing the task
@@ -84,7 +120,7 @@ public class A2AClient {
     }
     
     /**
-     * Cancel a task
+     * Cancel a task (A2A v0.3.0 compliant)
      * 
      * @param params task ID parameters
      * @return JSON-RPC response containing the task
@@ -102,19 +138,19 @@ public class A2AClient {
     }
     
     /**
-     * Send a task with streaming response
+     * Send a message with streaming response (A2A v0.3.0 compliant)
      * 
-     * @param params task send parameters
+     * @param params message send parameters
      * @param listener event listener for streaming updates
      * @return CompletableFuture that completes when streaming ends
      */
-    public CompletableFuture<Void> sendTaskStreaming(TaskSendParams params, StreamingEventListener listener) {
+    public CompletableFuture<Void> sendMessageStreaming(MessageSendParams params, StreamingEventListener listener) {
         return CompletableFuture.runAsync(() -> {
             try {
                 JSONRPCRequest request = new JSONRPCRequest(
                     generateRequestId(),
                     "2.0",
-                    "message/send",
+                    "message/stream",
                     params
                 );
                 
@@ -140,7 +176,76 @@ public class A2AClient {
                     if (line.trim().isEmpty()) continue;
                     
                     try {
-                        SendTaskStreamingResponse streamingResponse = objectMapper.readValue(line, SendTaskStreamingResponse.class);
+                        SendMessageStreamingResponse streamingResponse = objectMapper.readValue(line, SendMessageStreamingResponse.class);
+                        
+                        if (streamingResponse.error() != null) {
+                            A2AError error = streamingResponse.error();
+                            Integer errorCode = error.code() != null ? error.code().getValue() : null;
+                            listener.onError(new A2AClientException(
+                                error.message(),
+                                errorCode
+                            ));
+                            return;
+                        }
+                        
+                        if (streamingResponse.result() != null) {
+                            listener.onEvent(streamingResponse.result());
+                        }
+                        
+                    } catch (Exception e) {
+                        listener.onError(new A2AClientException("Failed to parse streaming response", e));
+                        return;
+                    }
+                }
+                
+                listener.onComplete();
+                
+            } catch (Exception e) {
+                listener.onError(new A2AClientException("Streaming request failed", e));
+            }
+        });
+    }
+    
+    /**
+     * Send a task with streaming response (backwards compatibility)
+     * 
+     * @param params task send parameters
+     * @param listener event listener for streaming updates
+     * @return CompletableFuture that completes when streaming ends
+     */
+    public CompletableFuture<Void> sendTaskStreaming(TaskSendParams params, StreamingEventListener listener) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                JSONRPCRequest request = new JSONRPCRequest(
+                    generateRequestId(),
+                    "2.0",
+                    "message/stream",
+                    params
+                );
+                
+                String requestBody = objectMapper.writeValueAsString(request);
+                
+                HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "text/event-stream")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
+                
+                HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+                
+                if (response.statusCode() != 200) {
+                    listener.onError(new A2AClientException("HTTP " + response.statusCode() + ": " + response.body()));
+                    return;
+                }
+                
+                // Parse streaming response
+                String[] lines = response.body().split("\n");
+                for (String line : lines) {
+                    if (line.trim().isEmpty()) continue;
+                    
+                    try {
+                        SendMessageStreamingResponse streamingResponse = objectMapper.readValue(line, SendMessageStreamingResponse.class);
                         
                         if (streamingResponse.error() != null) {
                             A2AError error = streamingResponse.error();
@@ -179,7 +284,7 @@ public class A2AClient {
     public AgentCard getAgentCard() throws A2AClientException {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/.well-known/agent.json"))
+                .uri(URI.create(baseUrl + "/.well-known/agent-card"))
                 .header("Accept", "application/json")
                 .GET()
                 .build();

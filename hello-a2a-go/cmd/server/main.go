@@ -73,8 +73,8 @@ func translationTaskHandler(task *models.Task, message *models.Message) (*models
 	// Extract text from message parts
 	var inputText string
 	for _, part := range message.Parts {
-		if part.Text != nil {
-			inputText += *part.Text
+		if textPart, ok := part.(models.TextPart); ok {
+			inputText += textPart.Text
 		}
 	}
 

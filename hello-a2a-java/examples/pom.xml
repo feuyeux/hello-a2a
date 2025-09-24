@@ -10,17 +10,25 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>a2a-client</artifactId>
+    <artifactId>a2a-examples</artifactId>
+    <name>A2A Examples</name>
+    <description>Example applications and CLI tools for A2A protocol</description>
 
     <properties>
         <jackson.version>2.18.2</jackson.version>
-        <mockito.version>5.19.0</mockito.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <a2a.sdk.version>0.3.0.Beta1</a2a.sdk.version>
     </properties>
 
     <dependencies>
+        <!-- Official A2A Java SDK Specification -->
+        <dependency>
+            <groupId>io.github.a2asdk</groupId>
+            <artifactId>a2a-java-sdk-spec</artifactId>
+            <version>${a2a.sdk.version}</version>
+        </dependency>
+        
         <!-- Official A2A Java SDK Client -->
         <dependency>
             <groupId>io.github.a2asdk</groupId>
@@ -28,37 +36,11 @@
             <version>${a2a.sdk.version}</version>
         </dependency>
         
-        <!-- A2A Java SDK Specification -->
-        <dependency>
-            <groupId>io.github.a2asdk</groupId>
-            <artifactId>a2a-java-sdk-spec</artifactId>
-            <version>${a2a.sdk.version}</version>
-        </dependency>
-
         <!-- Jackson for JSON processing -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
-        </dependency>
-
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -70,5 +52,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

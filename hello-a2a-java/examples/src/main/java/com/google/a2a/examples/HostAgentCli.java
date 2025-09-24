@@ -1,7 +1,12 @@
-package com.google.a2a.client;
+package com.google.a2a.examples;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.a2a.model.*;
+import com.google.a2a.client.A2AClient;
+import com.google.a2a.client.StreamingEventListener;
+import com.google.a2a.client.util.LLMAgentSelector;
+import com.google.a2a.client.util.RemoteAgentRegistry;
+import com.google.a2a.client.util.RemoteAgentProcess;
+import io.a2a.spec.*;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.*;
@@ -110,7 +115,7 @@ public class HostAgentCli {
      */
     public boolean handleUserQuery(String query) {
         // Get available agents
-        List<AgentInfo> availableAgents = registry.listAgents();
+        List<RemoteAgentRegistry.AgentInfo> availableAgents = registry.listAgents();
         if (availableAgents.isEmpty()) {
             System.out.println("❌ No agents available");
             return false;
@@ -118,7 +123,7 @@ public class HostAgentCli {
         
         System.out.println("\n🤔 Analyzing query: '" + query + "'");
         System.out.println("🔍 Available agents:");
-        for (AgentInfo agent : availableAgents) {
+        for (RemoteAgentRegistry.AgentInfo agent : availableAgents) {
             System.out.println("   - " + agent.name() + ": " + agent.description());
         }
         
@@ -433,5 +438,5 @@ public class HostAgentCli {
     /**
      * Agent information record
      */
-    public record AgentInfo(String name, String description, String url) {}
+
 }

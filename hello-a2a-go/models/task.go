@@ -8,42 +8,6 @@ type FileContentBase struct {
 	MimeType *string `json:"mimeType,omitempty"`
 }
 
-// FileContentBytes represents file content as base64-encoded bytes
-type FileContentBytes struct {
-	FileContentBase
-	// Bytes is the file content encoded as a Base64 string
-	Bytes string `json:"bytes"`
-}
-
-// FileContentURI represents file content as a URI
-type FileContentURI struct {
-	FileContentBase
-	// URI is the URI pointing to the file content
-	URI string `json:"uri"`
-}
-
-// FileContent represents either bytes or URI-based file content
-type FileContent interface {
-	IsFileContent()
-}
-
-func (FileContentBytes) IsFileContent() {}
-func (FileContentURI) IsFileContent()   {}
-
-// Part represents a part of a message or artifact
-type Part struct {
-	// Type identifies the type of this part
-	Type *string `json:"type,omitempty"`
-	// Text is the text content for text parts
-	Text *string `json:"text,omitempty"`
-	// File is the file content for file parts
-	File FileContent `json:"file,omitempty"`
-	// Data is the structured data content for data parts
-	Data map[string]interface{} `json:"data,omitempty"`
-	// Metadata is optional metadata associated with this part
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
-
 // Artifact represents an output or intermediate file from a task
 type Artifact struct {
 	// Name is an optional name for the artifact
@@ -71,12 +35,6 @@ type TaskStatus struct {
 type Task struct {
 	ID     string     `json:"id"`
 	Status TaskStatus `json:"status"`
-}
-
-// Message represents a message in the A2A protocol
-type Message struct {
-	Role  string `json:"role"`
-	Parts []Part `json:"parts"`
 }
 
 // TaskHistory represents the history of a task

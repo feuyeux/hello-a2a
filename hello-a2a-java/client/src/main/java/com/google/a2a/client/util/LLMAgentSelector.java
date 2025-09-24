@@ -1,4 +1,4 @@
-package com.google.a2a.client;
+package com.google.a2a.client.util;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class LLMAgentSelector {
     /**
      * Select the best agent for the user query using rule-based logic
      */
-    public String selectAgent(String userQuery, List<HostAgentCli.AgentInfo> availableAgents) {
+    public String selectAgent(String userQuery, List<RemoteAgentRegistry.AgentInfo> availableAgents) {
         if (availableAgents.isEmpty()) {
             return null;
         }
@@ -63,8 +63,8 @@ public class LLMAgentSelector {
     /**
      * Find agent by keyword in name or description
      */
-    private String findAgentByKeyword(List<HostAgentCli.AgentInfo> agents, String keyword) {
-        for (HostAgentCli.AgentInfo agent : agents) {
+    private String findAgentByKeyword(List<RemoteAgentRegistry.AgentInfo> agents, String keyword) {
+        for (RemoteAgentRegistry.AgentInfo agent : agents) {
             if (agent.name().toLowerCase().contains(keyword) || 
                 agent.description().toLowerCase().contains(keyword)) {
                 return agent.name();

@@ -1,5 +1,20 @@
 package models
 
+// MessageSendParams represents parameters for sending a message (A2A v0.3.0)
+type MessageSendParams struct {
+	ID      string  `json:"id"`
+	Message Message `json:"message"`
+	Config  *MessageSendConfiguration `json:"config,omitempty"`
+}
+
+// MessageSendConfiguration represents configuration for message sending
+type MessageSendConfiguration struct {
+	Streaming         *bool                     `json:"streaming,omitempty"`
+	PushNotifications *PushNotificationConfig   `json:"pushNotifications,omitempty"`
+}
+
+// Legacy TaskSendParams for backwards compatibility
+
 // TaskSendParams represents the parameters for sending a task message
 type TaskSendParams struct {
 	// ID is the unique identifier for the task being initiated or continued
