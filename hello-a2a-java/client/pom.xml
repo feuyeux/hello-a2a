@@ -21,6 +21,13 @@
     </properties>
 
     <dependencies>
+        <!-- Internal model module -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>a2a-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
         <!-- Official A2A Java SDK Client -->
         <dependency>
             <groupId>io.github.a2asdk</groupId>

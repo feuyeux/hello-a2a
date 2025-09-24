@@ -2,7 +2,7 @@ package com.google.a2a.client.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.a2a.client.A2AClient;
-import io.a2a.spec.AgentCard;
+import com.google.a2a.model.AgentCard;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

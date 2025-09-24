@@ -3,7 +3,7 @@ package com.google.a2a.examples;
 import com.google.a2a.client.A2AClient;
 import com.google.a2a.client.A2AClientException;
 import com.google.a2a.client.StreamingEventListener;
-import io.a2a.spec.*;
+import com.google.a2a.model.*;
 
 import java.util.List;
 import java.util.Map;

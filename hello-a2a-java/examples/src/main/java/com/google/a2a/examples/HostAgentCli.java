@@ -6,7 +6,7 @@ import com.google.a2a.client.StreamingEventListener;
 import com.google.a2a.client.util.LLMAgentSelector;
 import com.google.a2a.client.util.RemoteAgentRegistry;
 import com.google.a2a.client.util.RemoteAgentProcess;
-import io.a2a.spec.*;
+import com.google.a2a.model.*;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.*;
@@ -303,9 +303,9 @@ public class HostAgentCli {
                 if (query.equalsIgnoreCase("quit") || query.equals(":q") || query.equalsIgnoreCase("exit")) {
                     break;
                 } else if (query.equalsIgnoreCase("agents")) {
-                    List<AgentInfo> agents = registry.listAgents();
+                    List<RemoteAgentRegistry.AgentInfo> agents = registry.listAgents();
                     System.out.println("\n📋 Available remote agents:");
-                    for (AgentInfo agent : agents) {
+                    for (RemoteAgentRegistry.AgentInfo agent : agents) {
                         System.out.println("   • " + agent.name() + ": " + agent.description());
                     }
                 } else if (!query.isEmpty()) {
