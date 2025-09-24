@@ -14,7 +14,7 @@
 
     <properties>
         <jackson.version>2.18.2</jackson.version>
-        <mockito.version>5.19.0</mockito.version>
+        <mockito.version>5.20.0</mockito.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <a2a.sdk.version>0.3.0.Beta1</a2a.sdk.version>
