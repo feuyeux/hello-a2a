@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Service class that provides dice rolling and prime number functionality. */
 @ApplicationScoped
@@ -17,6 +19,8 @@ public class DiceTools {
   /** Default number of sides to use. */
   private static final int DEFAULT_NUM_SIDES = 6;
 
+  private static final Logger LOG = LoggerFactory.getLogger(DiceTools.class);
+
   /**
    * Rolls an N sided dice. If number of sides aren't given, uses 6.
    *
@@ -25,11 +29,15 @@ public class DiceTools {
    */
   @Tool("Rolls an n sided dice. If number of sides aren't given, uses 6.")
   public int rollDice(final int n) {
+    LOG.debug("rollDice called with n={}", n);
     int sides = n;
     if (sides <= 0) {
+      LOG.warn("Invalid number of sides ({}). Falling back to default {}.", sides, DEFAULT_NUM_SIDES);
       sides = DEFAULT_NUM_SIDES; // Default to 6 sides if invalid input
     }
-    return random.nextInt(sides) + 1;
+    int result = random.nextInt(sides) + 1;
+    LOG.info("rollDice result: sides={}, result={}", sides, result);
+    return result;
   }
 
   /**
@@ -40,15 +48,22 @@ public class DiceTools {
    */
   @Tool("Check if a given list of numbers are prime.")
   public String checkPrime(final List<Integer> nums) {
+    LOG.debug("checkPrime called with nums={}", nums);
     Set<Integer> primes = new HashSet<>();
+
+    if (nums == null || nums.isEmpty()) {
+      LOG.info("checkPrime received empty or null list");
+    }
 
     for (Integer number : nums) {
       if (number == null) {
+        LOG.debug("Skipping null entry in nums");
         continue;
       }
 
       int num = number.intValue();
       if (num <= 1) {
+        LOG.debug("Skipping non-positive or 1: {}", num);
         continue;
       }
 
@@ -62,17 +77,25 @@ public class DiceTools {
 
       if (isPrime) {
         primes.add(num);
+        LOG.debug("Found prime: {}", num);
+      } else {
+        LOG.debug("Not prime: {}", num);
       }
     }
 
+    final String result;
     if (primes.isEmpty()) {
-      return "No prime numbers found.";
+      result = "No prime numbers found.";
+      LOG.info("checkPrime result: {}", result);
     } else {
-      return primes.stream()
+      result = primes.stream()
               .sorted()
               .map(String::valueOf)
               .collect(java.util.stream.Collectors.joining(", "))
           + " are prime numbers.";
+      LOG.info("checkPrime result: primes={}, output={}", primes, result);
     }
+
+    return result;
   }
 }

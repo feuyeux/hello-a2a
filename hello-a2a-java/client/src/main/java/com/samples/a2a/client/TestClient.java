@@ -13,6 +13,7 @@ import io.a2a.client.transport.grpc.GrpcTransport;
 import io.a2a.client.transport.grpc.GrpcTransportConfig;
 import io.a2a.client.transport.jsonrpc.JSONRPCTransport;
 import io.a2a.client.transport.jsonrpc.JSONRPCTransportConfig;
+import io.a2a.spec.A2AClientException;
 import io.a2a.spec.AgentCard;
 import io.a2a.spec.Artifact;
 import io.a2a.spec.Message;
@@ -22,16 +23,22 @@ import io.a2a.spec.TaskStatusUpdateEvent;
 import io.a2a.spec.TextPart;
 import io.a2a.spec.UpdateEvent;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Creates an A2A client that sends a test message to the A2A server agent. */
 public final class TestClient {
+  private static final Logger LOG = LoggerFactory.getLogger(TestClient.class);
 
   /** The default server URL to use. */
   private static final String DEFAULT_SERVER_URL = "http://localhost:11000";
@@ -61,7 +68,7 @@ public final class TestClient {
             serverUrl = args[i + 1];
             i++;
           } else {
-            System.err.println("Error: --server-url requires a value");
+            LOG.error("Error: --server-url requires a value");
             printUsageAndExit();
           }
           break;
@@ -70,7 +77,7 @@ public final class TestClient {
             messageText = args[i + 1];
             i++;
           } else {
-            System.err.println("Error: --message requires a value");
+            LOG.error("Error: --message requires a value");
             printUsageAndExit();
           }
           break;
@@ -79,78 +86,100 @@ public final class TestClient {
           printUsageAndExit();
           break;
         default:
-          System.err.println("Error: Unknown argument: " + args[i]);
+          LOG.error("Error: Unknown argument: {}", args[i]);
           printUsageAndExit();
       }
     }
+    try {
+      run(serverUrl, messageText);
+    } catch (Exception e) {
+      LOG.error("An error occurred: {}", e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Client entry point.
+   *
+   * @param serverUrl The server URL to connect to.
+   * @param messageText The message to send.
+   * @throws Exception if an error occurs.
+   */
+  public static void run(final String serverUrl, final String messageText) throws Exception {
+    LOG.info("Connecting to dice agent at: {}", serverUrl);
+
+    // Fetch the public agent card
+    AgentCard publicAgentCard = new A2ACardResolver(serverUrl).getAgentCard();
+    LOG.info("Successfully fetched public agent card:");
+    LOG.info(OBJECT_MAPPER.writeValueAsString(publicAgentCard));
+    LOG.info("Using public agent card for client initialization.");
+
+    // Create a CompletableFuture to handle async response
+    final CompletableFuture<String> messageResponse = new CompletableFuture<>();
+    
+    // Keep track of managed channels for cleanup
+    final List<ManagedChannel> managedChannels = new ArrayList<>();
+
+    // Create the client
+    Client client = initClient(publicAgentCard, messageResponse, managedChannels);
 
     try {
-      System.out.println("Connecting to dice agent at: " + serverUrl);
-
-      // Fetch the public agent card
-      AgentCard publicAgentCard =
-              new A2ACardResolver(serverUrl).getAgentCard();
-      System.out.println("Successfully fetched public agent card:");
-      System.out.println(OBJECT_MAPPER.writeValueAsString(publicAgentCard));
-      System.out.println("Using public agent card for client initialization.");
-
-      // Create a CompletableFuture to handle async response
-      final CompletableFuture<String> messageResponse
-              = new CompletableFuture<>();
-
-      // Create consumers for handling client events
-      List<BiConsumer<ClientEvent, AgentCard>> consumers
-              = getConsumers(messageResponse);
-
-      // Create error handler for streaming errors
-      Consumer<Throwable> streamingErrorHandler = (error) -> {
-        System.out.println("Streaming error occurred: " + error.getMessage());
-        error.printStackTrace();
-        messageResponse.completeExceptionally(error);
-      };
-
-      // Create channel factory for gRPC transport
-      Function<String, Channel> channelFactory = agentUrl -> {
-        return ManagedChannelBuilder.forTarget(agentUrl).usePlaintext().build();
-      };
-
-      ClientConfig clientConfig = new ClientConfig.Builder()
-              .setAcceptedOutputModes(List.of("Text"))
-              .build();
-
-      // Create the client with both JSON-RPC and gRPC transport support.
-      // The A2A server agent's preferred transport is gRPC, since the client
-      // also supports gRPC, this is the transport that will get used
-      Client client = Client.builder(publicAgentCard)
-          .addConsumers(consumers)
-          .streamingErrorHandler(streamingErrorHandler)
-          .withTransport(GrpcTransport.class,
-                  new GrpcTransportConfig(channelFactory))
-          .withTransport(JSONRPCTransport.class,
-                  new JSONRPCTransportConfig())
-          .clientConfig(clientConfig)
-          .build();
-
       // Create and send the message
       Message message = A2A.toUserMessage(messageText);
 
-      System.out.println("Sending message: " + messageText);
+      LOG.info("Sending message: {}", messageText);
       client.sendMessage(message);
-      System.out.println("Message sent successfully. Waiting for response...");
+      LOG.info("Message sent successfully. Waiting for response...");
 
       try {
         // Wait for response with timeout
         String responseText = messageResponse.get();
-        System.out.println("Final response: " + responseText);
-      } catch (Exception e) {
-        System.err.println("Failed to get response: " + e.getMessage());
-        e.printStackTrace();
+        LOG.info("Final response: {}", responseText);
+      } catch (InterruptedException e) {
+        LOG.error("Interrupted while waiting for response: {}", e.getMessage(), e);
+        Thread.currentThread().interrupt();
+      } catch (ExecutionException e) {
+        LOG.error("Failed to get response: {}", e.getCause().getMessage(), e.getCause());
       }
-
-    } catch (Exception e) {
-      System.err.println("An error occurred: " + e.getMessage());
-      e.printStackTrace();
+    } finally {
+      // Clean up resources
+      cleanupResources(client, managedChannels);
     }
+  }
+
+  private static Client initClient(
+      final AgentCard publicAgentCard, 
+      final CompletableFuture<String> messageResponse,
+      final List<ManagedChannel> managedChannels) throws A2AClientException {
+    // Create consumers for handling client events
+    List<BiConsumer<ClientEvent, AgentCard>> consumers = getConsumers(messageResponse);
+
+    // Create error handler for streaming errors
+    Consumer<Throwable> streamingErrorHandler =
+        (error) -> {
+          LOG.error("Streaming error occurred: {}", error.getMessage(), error);
+          messageResponse.completeExceptionally(error);
+        };
+
+    // Create channel factory for gRPC transport that tracks channels for cleanup
+    Function<String, Channel> channelFactory =
+        agentUrl -> {
+          ManagedChannel channel = ManagedChannelBuilder.forTarget(agentUrl).usePlaintext().build();
+          managedChannels.add(channel);
+          return channel;
+        };
+
+    ClientConfig clientConfig = new ClientConfig.Builder().setAcceptedOutputModes(List.of("Text")).build();
+
+    // Create the client with both JSON-RPC and gRPC transport support.
+    // The A2A server agent's preferred transport is gRPC, since the client
+    // also supports gRPC, this is the transport that will get used
+    return Client.builder(publicAgentCard)
+        .addConsumers(consumers)
+        .streamingErrorHandler(streamingErrorHandler)
+        .withTransport(GrpcTransport.class, new GrpcTransportConfig(channelFactory))
+        .withTransport(JSONRPCTransport.class, new JSONRPCTransportConfig())
+        .clientConfig(clientConfig)
+        .build();
   }
 
   private static List<BiConsumer<ClientEvent, AgentCard>> getConsumers(
@@ -161,15 +190,15 @@ public final class TestClient {
           if (event instanceof MessageEvent messageEvent) {
             Message responseMessage = messageEvent.getMessage();
             String text = extractTextFromParts(responseMessage.getParts());
-            System.out.println("Received message: " + text);
+            LOG.info("Received message: {}", text);
             messageResponse.complete(text);
           } else if (event instanceof TaskUpdateEvent taskUpdateEvent) {
             UpdateEvent updateEvent = taskUpdateEvent.getUpdateEvent();
             if (updateEvent
                     instanceof TaskStatusUpdateEvent taskStatusUpdateEvent) {
-              System.out.println(
-                  "Received status-update: "
-                      + taskStatusUpdateEvent.getStatus().state().asString());
+              LOG.info(
+                  "Received status-update: {}",
+                  taskStatusUpdateEvent.getStatus().state().asString());
               if (taskStatusUpdateEvent.isFinal()) {
                 StringBuilder textBuilder = new StringBuilder();
                 List<Artifact> artifacts
@@ -186,11 +215,10 @@ public final class TestClient {
                       .getArtifact()
                       .parts();
               String text = extractTextFromParts(parts);
-              System.out.println("Received artifact-update: " + text);
+              LOG.info("Received artifact-update: {}", text);
             }
           } else if (event instanceof TaskEvent taskEvent) {
-            System.out.println("Received task event: "
-                    + taskEvent.getTask().getId());
+            LOG.info("Received task event: {}", taskEvent.getTask().getId());
           }
         });
     return consumers;
@@ -208,24 +236,65 @@ public final class TestClient {
     return textBuilder.toString();
   }
 
+  /**
+   * Clean up client and gRPC resources to prevent thread lingering warnings.
+   *
+   * @param client The A2A client to close
+   * @param managedChannels List of gRPC channels to shut down
+   */
+  private static void cleanupResources(final Client client, final List<ManagedChannel> managedChannels) {
+    LOG.info("Cleaning up resources...");
+    
+    // Close the client if it implements AutoCloseable
+    try {
+      if (client instanceof AutoCloseable) {
+        ((AutoCloseable) client).close();
+      }
+    } catch (Exception e) {
+      LOG.warn("Error closing client: {}", e.getMessage(), e);
+    }
+    
+    // Shutdown all managed channels
+    for (ManagedChannel channel : managedChannels) {
+      try {
+        channel.shutdown();
+        if (!channel.awaitTermination(5, TimeUnit.SECONDS)) {
+          LOG.warn("Channel did not terminate gracefully, forcing shutdown");
+          channel.shutdownNow();
+          if (!channel.awaitTermination(5, TimeUnit.SECONDS)) {
+            LOG.warn("Channel did not terminate after forced shutdown");
+          }
+        }
+      } catch (InterruptedException e) {
+        LOG.warn("Interrupted while shutting down channel: {}", e.getMessage(), e);
+        channel.shutdownNow();
+        Thread.currentThread().interrupt();
+      } catch (Exception e) {
+        LOG.warn("Error shutting down channel: {}", e.getMessage(), e);
+      }
+    }
+    
+    LOG.info("Resource cleanup completed");
+  }
+
   private static void printUsageAndExit() {
-    System.out.println("Usage: TestClient [OPTIONS]");
-    System.out.println();
-    System.out.println("Options:");
-    System.out.println("  --server-url URL    "
+    LOG.info("Usage: TestClient [OPTIONS]");
+    LOG.info("");
+    LOG.info("Options:");
+    LOG.info("  --server-url URL    "
             + "The URL of the A2A server agent (default: "
             + DEFAULT_SERVER_URL + ")");
-    System.out.println("  --message TEXT      "
+    LOG.info("  --message TEXT      "
             + "The message to send to the agent "
             + "(default: \"" + MESSAGE_TEXT + "\")");
-    System.out.println("  --help, -h          "
+    LOG.info("  --help, -h          "
             + "Show this help message and exit");
-    System.out.println();
-    System.out.println("Examples:");
-    System.out.println("  TestClient --server-url http://localhost:11001");
-    System.out.println("  TestClient --message "
+    LOG.info("");
+    LOG.info("Examples:");
+    LOG.info("  TestClient --server-url http://localhost:11001");
+    LOG.info("  TestClient --message "
             + "\"Can you roll a 12-sided die?\"");
-    System.out.println("  TestClient --server-url http://localhost:11001 "
+    LOG.info("  TestClient --server-url http://localhost:11001 "
             + "--message \"Is 17 prime?\"");
     System.exit(0);
   }

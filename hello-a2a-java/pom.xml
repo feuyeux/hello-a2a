@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.samples.a2a</groupId>
-    <artifactId>dice-agent-multi-transport</artifactId>
+    <artifactId>hello-a2a</artifactId>
     <version>0.1.0</version>
     <packaging>pom</packaging>
 

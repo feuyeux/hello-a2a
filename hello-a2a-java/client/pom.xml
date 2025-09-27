@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>com.samples.a2a</groupId>
-        <artifactId>dice-agent-multi-transport</artifactId>
+        <artifactId>hello-a2a</artifactId>
         <version>0.1.0</version>
     </parent>
 
@@ -34,6 +34,23 @@
             <artifactId>grpc-netty-shaded</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Logging: provide an SLF4J 2.x compatible implementation backed by Log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.20.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -47,6 +64,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.samples.a2a.client.TestClient</mainClass>
+                    <classpathScope>runtime</classpathScope>
                 </configuration>
             </plugin>
         </plugins>
