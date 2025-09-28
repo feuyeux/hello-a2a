@@ -12,15 +12,11 @@ https://github.com/a2aproject/a2a-samples/tree/main/samples/java/agents/dice_age
 
 ## 运行 A2A 服务器智能体
 
-**注意**: 在运行服务器之前，请确保配置了正确的 Ollama 模型。当前配置使用 `qwen3` 模型，但实际可用的模型可能是 `qwen2.5:8b`。
-
 ```sh
 cd server
 # 如果遇到模型不存在的错误，请先检查 src/main/resources/application.properties 中的模型配置
 mvn quarkus:dev
 ```
-
-如果遇到 "Model does not exist" 错误，请修改 `server/src/main/resources/application.properties` 文件中的模型名称为实际可用的模型。
 
 ## 运行 A2A 客户端
 
