@@ -23,7 +23,7 @@
         <jakarta.enterprise.cdi-api.version>4.1.0</jakarta.enterprise.cdi-api.version>
         <quarkus.platform.version>3.26.1</quarkus.platform.version>
         <quarkus.langchain4j.version>1.2.0</quarkus.langchain4j.version>
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.42</lombok.version>
     </properties>
 
     <dependencyManagement>
