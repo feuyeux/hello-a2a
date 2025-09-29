@@ -179,7 +179,7 @@ docstring_parser==0.17.0
 fsspec==2025.9.0
 ghp-import==2.1.0
 graphviz==0.21
-hf-xet==1.1.5
+hf-xet==1.1.10
 importlib_metadata==8.7.0
 jsonpatch==1.33
 jsonpointer==3.0.0
