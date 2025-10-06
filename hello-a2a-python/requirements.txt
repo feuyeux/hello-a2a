@@ -16,7 +16,7 @@ llama-index==0.14.2
 llama-index-llms-ollama==0.7.2
 openai==1.107.3
 pyautogen==0.9.0
-semantic-kernel==1.32.2
+semantic-kernel==1.37.0
 
 # Google Cloud & ADK
 google-adk==1.14.1
