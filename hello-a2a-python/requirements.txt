@@ -51,7 +51,7 @@ aiohttp==3.13.0
 aiohappyeyeballs==2.6.1
 httpx==0.28.1
 httpx-aiohttp==0.1.8
-httpx-sse==0.4.1
+httpx-sse==0.4.3
 requests==2.32.5
 requests-toolbelt==1.0.0
 urllib3==2.5.0
