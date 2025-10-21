@@ -18,7 +18,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <protobuf.version>4.32.1</protobuf.version>
+        <protobuf.version>4.33.0</protobuf.version>
         <io.a2a.sdk.version>0.3.0.Beta2</io.a2a.sdk.version>
         <jakarta.enterprise.cdi-api.version>4.1.0</jakarta.enterprise.cdi-api.version>
         <quarkus.platform.version>3.28.4</quarkus.platform.version>
