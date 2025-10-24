@@ -103,7 +103,7 @@ click==8.2.1
 asyncclick==8.1.8.0
 tenacity==9.1.2
 tqdm==4.67.1
-filelock==3.18.0
+filelock==3.20.0
 filetype==1.2.0
 python-multipart==0.0.20
 termcolor==3.1.0
