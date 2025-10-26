@@ -13,8 +13,9 @@ https://github.com/a2aproject/a2a-samples/tree/main/samples/java/agents/dice_age
 ## 运行 A2A 服务器智能体
 
 ```sh
-cd server
 # 如果遇到模型不存在的错误，请先检查 src/main/resources/application.properties 中的模型配置
+ollama list
+cd server
 mvn quarkus:dev
 ```
 

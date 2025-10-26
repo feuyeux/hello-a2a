@@ -203,4 +203,3 @@ curl -X POST http://localhost:8080/a2a \
 go test ./...
 ```
 
-MIT License
