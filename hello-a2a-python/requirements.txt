@@ -190,7 +190,7 @@ paginate==0.5.7
 pathspec==0.12.1
 pyparsing==3.2.3
 shapely==2.1.1
-xxhash==3.5.0
+xxhash==3.6.0
 zstandard==0.25.0
 
 # Documentation (Development)
