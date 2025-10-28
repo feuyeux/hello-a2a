@@ -36,7 +36,7 @@ google-cloud-trace==1.16.2
 google-crc32c==1.7.1
 google-genai==1.36.0
 google-resumable-media==2.7.2
-googleapis-common-protos==1.70.0
+googleapis-common-protos==1.71.0
 
 # Web Framework & API
 fastapi==0.118.0
