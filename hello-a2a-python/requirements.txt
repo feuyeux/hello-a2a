@@ -132,7 +132,7 @@ opentelemetry-sdk==1.37.0
 grpcio==1.75.1
 grpcio-status==1.74.0
 grpc-google-iam-v1==0.14.2
-protobuf==6.32.1
+protobuf==6.33.0
 proto-plus==1.26.1
 
 # Low-level Dependencies
