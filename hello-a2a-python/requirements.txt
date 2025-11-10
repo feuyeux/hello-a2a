@@ -138,7 +138,7 @@ proto-plus==1.26.1
 # Low-level Dependencies
 attrs==25.3.0
 annotated-types==0.7.0
-certifi==2025.8.3
+certifi==2025.10.5
 cffi==2.0.0
 charset-normalizer==3.4.3
 frozenlist==1.8.0
