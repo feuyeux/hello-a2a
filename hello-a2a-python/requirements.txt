@@ -203,7 +203,7 @@ pymdown-extensions==10.16.1
 # Development Tools (Optional)
 coverage==7.11.3
 iniconfig==2.1.0
-mypy==1.16.1
+mypy==1.18.2
 mypy_extensions==1.1.0
 pluggy==1.6.0
 pytest==9.0.0
