@@ -150,7 +150,7 @@ itsdangerous==2.2.0
 jiter==0.11.0
 multidict==6.6.4
 packaging==25.0
-platformdirs==4.3.8
+platformdirs==4.5.0
 propcache==0.3.2
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
