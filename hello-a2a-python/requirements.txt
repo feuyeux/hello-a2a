@@ -65,7 +65,7 @@ tokenizers==0.22.1
 huggingface-hub==0.34.4
 
 # MCP & Tools
-mcp==1.18.0
+mcp==1.21.2
 litellm==1.79.0
 
 # Authentication & Security
